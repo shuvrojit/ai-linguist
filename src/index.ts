@@ -1,11 +1,12 @@
 import app from './app';
 import dotenv from 'dotenv';
 import logger from './config/logger';
-import connectDB from './config/db';
+// import connectDB from './config/db';
 
 dotenv.config();
 
-connectDB();
+// connectDB();
+console.log(process.env.PORT);
 
 const PORT: number = Number(process.env.PORT) || 8000;
 
