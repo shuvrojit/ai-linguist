@@ -1,8 +1,8 @@
 import express, { Express, Response } from 'express';
 import morganMiddleware from './config/morgan';
-import featureRouter from './routes/v1/features.routes';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import featureRouter from './routes/v1/features.routes';
 
 const app: Express = express();
 
