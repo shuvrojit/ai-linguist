@@ -1,7 +1,7 @@
-import app from './app';
-import logger from './config/logger';
 import connectDB from './config/db';
+import logger from './config/logger';
 import { PORT } from './config/config';
+import app from './app';
 
 connectDB();
 
