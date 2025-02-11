@@ -2,7 +2,7 @@ import express, { Express, Response } from 'express';
 import morganMiddleware from './config/morgan';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import featureRouter from './routes/v1/features.routes';
+import { featureRouter, pageContentRouter } from './routes/v1';
 
 const app: Express = express();
 
@@ -19,6 +19,7 @@ app.get('/', (_, res: Response) => {
   res.send('root');
 });
 
-app.use('/api', featureRouter);
+app.use('/api/features', featureRouter);
+app.use('/api/page-content', pageContentRouter);
 
 export default app;

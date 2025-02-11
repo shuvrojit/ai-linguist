@@ -1,4 +1,5 @@
 import AIRequest from '../utils/aiRequest';
+import prompts from '../utils/prompts';
 
 const summaryPrompt =
   "Summarize the following long blog post into a quick overview that captures all the main points and subjects discussed. The summary should be comprehensive yet concise, allowing a blog reader to quickly grasp the content. Keep the summary between 300 and 500 characters. Only Generate HTML for the content. Don't response with normal text just the html snippet nothing else";
@@ -8,6 +9,16 @@ const detailedOverviewPrompt =
 
 export const getSummary = async (content: string) => {
   const response = await AIRequest('gpt-4o-mini', summaryPrompt, content);
+  return response;
+};
+
+export const extractMeaningfullText = async (content: string) => {
+  const response = await AIRequest(
+    'gpt-4o-mini-2024-07-18',
+    prompts.htmlToMeaningfullText,
+    content
+  );
+  console.log(response);
   return response;
 };
 

@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { summarize, overview } from '../../controllers/features.controller';
+import { featuresController } from '../../controllers';
 
 const featureRouter = Router();
 
-featureRouter.post('/summary', summarize);
-featureRouter.post('/detailed-overview', overview);
+featureRouter.post('/summary', featuresController.summarize);
+featureRouter.post('/extract', featuresController.extractText);
+featureRouter.post('/detailed-overview', featuresController.overview);
 
 export default featureRouter;
