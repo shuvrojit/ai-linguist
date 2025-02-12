@@ -1,14 +1,5 @@
-import {
-  getSummary,
-  extractMeaningfullText,
-  detailOverview,
-} from './features.service';
-import { pageContentService } from './pageContent.service';
+import * as featuresService from './features.service';
+import * as pageContentService from './pageContent.service';
+import * as jobDescriptionService from './jobDescription.service';
 
-export const featuresService = {
-  getSummary,
-  extractMeaningfullText,
-  detailOverview,
-};
-
-export { pageContentService };
+export { featuresService, pageContentService, jobDescriptionService };
