@@ -22,8 +22,8 @@ const AIRequest = async (
           content: option ? `${option}: ${userContent}` : userContent,
         },
       ],
-      temperature: 0.7,
-      max_tokens: 256,
+      temperature: 0.3,
+      // max_tokens: 256,
       top_p: 1,
     });
     return result.choices[0]?.message.content || null;
