@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-interface IJobDescription {
+export interface IJobDescription {
   company_title: string;
   job_position: string;
   job_location: string;
