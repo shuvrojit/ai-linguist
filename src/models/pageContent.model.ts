@@ -31,12 +31,12 @@ const PageContentSchema: Schema<IPageContent> = new Schema(
     },
     baseurl: {
       type: String,
-      required: [true, 'Base URL is required'],
+      // required: [true, 'Base URL is required'],
       trim: true,
     },
     html: {
       type: String,
-      required: [true, 'HTML content is required'],
+      // required: [true, 'HTML content is required'],
     },
     media: {
       type: [String],

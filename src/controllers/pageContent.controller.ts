@@ -1,25 +1,27 @@
 import { Request, Response } from 'express';
 import { pageContentService } from '../services';
 import logger from '../config/logger';
+import { extractPageInformation } from '../services/pageContent.service';
 
 export const pageContentController = {
   async create(req: Request, res: Response) {
     try {
       const rawContent = req.body;
-      const cleanedContent = await pageContentService.cleanContent(rawContent);
-      const existingContent = await pageContentService.findByUrl(
-        cleanedContent.url
-      );
+      // const cleanedContent = await pageContentService.cleanContent(rawContent);
+      // console.log(cleanedContent);
+      // const existingContent = await pageContentService.findByUrl(
+      //   cleanedContent.url
+      // );
 
-      if (existingContent) {
-        return res.status(409).json({
-          success: false,
-          message: 'Content for this URL already exists',
-          data: existingContent,
-        });
-      }
+      // if (existingContent) {
+      //   return res.status(409).json({
+      //     success: false,
+      //     message: 'Content for this URL already exists',
+      //     data: existingContent,
+      //   });
+      // }
 
-      const content = await pageContentService.create(cleanedContent);
+      const content = await pageContentService.create(rawContent);
       res.status(201).json({
         success: true,
         data: content,
@@ -32,6 +34,11 @@ export const pageContentController = {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
+    process.nextTick(async () => {
+      console.log('Processing next tick');
+      const res = await extractPageInformation(req.body?.text);
+      console.log(res);
+    });
   },
 
   async getByUrl(req: Request, res: Response) {

@@ -1,5 +1,7 @@
 import { IPageContent } from '../models/pageContent.model';
 import PageContentModel from '../models/pageContent.model';
+import AIRequest from '../utils/aiRequest';
+import prompts from '../utils/prompts';
 
 export interface CreatePageContent {
   title: string;
@@ -42,6 +44,8 @@ export const pageContentService = {
 
   async cleanContent(content: CreatePageContent): Promise<CreatePageContent> {
     // Remove extra whitespace and normalize text
+    console.log(content);
+
     const cleanedContent = {
       ...content,
       text: content.text.trim().replace(/\s+/g, ' '),
@@ -61,4 +65,9 @@ export const pageContentService = {
 
     return cleanedContent;
   },
+};
+
+export const extractPageInformation = async (text: string) => {
+  const response = await AIRequest('gpt-3.5-turbo', prompts.extract, text);
+  return response;
 };
