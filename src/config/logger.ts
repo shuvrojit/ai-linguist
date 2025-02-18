@@ -2,7 +2,27 @@ import { addColors, createLogger, format, transports } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import { Logger } from 'winston';
 
-// Define log levels for different environments
+/**
+ * Logger Configuration and Setup
+ *
+ * This module configures Winston logger with different log levels and formats for
+ * development and production environments.
+ *
+ * Log Levels (in order of severity):
+ * - error: 0 (highest priority)
+ * - warn: 1
+ * - info: 2
+ * - http: 3
+ * - debug: 4 (lowest priority)
+ *
+ * Features:
+ * - Color-coded console output in development
+ * - JSON formatting in production
+ * - Daily rotating file logs
+ * - Separate error log file
+ * - Exception handling
+ */
+
 const logLevels = {
   levels: {
     error: 0,
@@ -24,14 +44,37 @@ addColors(logLevels.colors);
 
 const isProduction = process.env.NODE_ENV === 'production';
 
+/**
+ * Winston logger instance with the following configurations:
+ *
+ * Production:
+ * - JSON formatted logs
+ * - Daily rotating files with 14-day retention
+ * - Separate error logs
+ * - Exception tracking
+ *
+ * Development:
+ * - Colorized console output
+ * - Detailed formatting
+ * - Debug level logging
+ *
+ * @example
+ * ```typescript
+ * import logger from './config/logger';
+ *
+ * // Usage
+ * logger.info('Server started');
+ * logger.error('Error occurred', error);
+ * logger.debug('Debug information');
+ * logger.http('Incoming request');
+ * ```
+ */
 const logger: Logger = createLogger({
   levels: logLevels.levels,
   level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
   format: format.combine(
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    isProduction
-      ? format.json() // JSON logs for production
-      : format.simple() // Human-readable logs for development
+    isProduction ? format.json() : format.simple()
   ),
   transports: [
     new transports.Console({
@@ -64,6 +107,7 @@ const logger: Logger = createLogger({
   exitOnError: false,
 });
 
+// Add console transport for non-production environments
 if (process.env.NODE_ENV !== 'production') {
   logger.add(
     new transports.Console({
