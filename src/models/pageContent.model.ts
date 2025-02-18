@@ -1,16 +1,39 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
 
+/**
+ * Interface for Page Content document
+ * Represents the structure of content extracted from web pages
+ *
+ * @extends Document - Mongoose Document type
+ */
 export interface IPageContent extends Document {
+  /** Title of the web page */
   title: string;
+  /** Main text content of the page */
   text: string;
+  /** Unique URL of the page */
   url: string;
+  /** Base URL of the website */
   baseurl: string;
+  /** Raw HTML content of the page */
   html: string;
-  media: string[]; // Assuming media is an array of strings (e.g., URLs or filenames)
+  /** Array of media URLs found on the page */
+  media: string[];
+  /** Timestamp of document creation */
   createdAt: Date;
+  /** Timestamp of last update */
   updatedAt: Date;
 }
 
+/**
+ * Mongoose Schema for Page Content
+ *
+ * Features:
+ * - Automatic timestamps (createdAt, updatedAt)
+ * - URL uniqueness validation
+ * - Required field validation
+ * - Text content trimming
+ */
 const PageContentSchema: Schema<IPageContent> = new Schema(
   {
     title: {
@@ -26,17 +49,15 @@ const PageContentSchema: Schema<IPageContent> = new Schema(
     url: {
       type: String,
       required: [true, 'URL is required'],
-      unique: true, // Ensures that each URL is unique in the collection
+      unique: true,
       trim: true,
     },
     baseurl: {
       type: String,
-      // required: [true, 'Base URL is required'],
       trim: true,
     },
     html: {
       type: String,
-      // required: [true, 'HTML content is required'],
     },
     media: {
       type: [String],
@@ -44,10 +65,33 @@ const PageContentSchema: Schema<IPageContent> = new Schema(
     },
   },
   {
-    timestamps: true, // Automatically adds createdAt and updatedAt fields
+    timestamps: true,
   }
 );
 
+/**
+ * Mongoose model for Page Content
+ *
+ * @example
+ * ```typescript
+ * import PageContentModel from './models/pageContent.model';
+ *
+ * // Create new content
+ * const content = new PageContentModel({
+ *   title: 'Example Page',
+ *   text: 'Page content...',
+ *   url: 'https://example.com',
+ *   baseurl: 'https://example.com',
+ *   html: '<html>...</html>'
+ * });
+ *
+ * // Save to database
+ * await content.save();
+ *
+ * // Find content by URL
+ * const found = await PageContentModel.findOne({ url: 'https://example.com' });
+ * ```
+ */
 const PageContentModel: Model<IPageContent> = mongoose.model<IPageContent>(
   'PageContent',
   PageContentSchema
