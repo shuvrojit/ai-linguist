@@ -1,25 +1,32 @@
 import { Request, Response } from 'express';
-import { pageContentService } from '../services';
+import {
+  pageContentService,
+  extractPageInformation,
+} from '../services/pageContent.service';
 import logger from '../config/logger';
-import { extractPageInformation } from '../services/pageContent.service';
 
 export const pageContentController = {
   async create(req: Request, res: Response) {
     try {
       const rawContent = req.body;
-      // const cleanedContent = await pageContentService.cleanContent(rawContent);
-      // console.log(cleanedContent);
-      // const existingContent = await pageContentService.findByUrl(
-      //   cleanedContent.url
-      // );
 
-      // if (existingContent) {
-      //   return res.status(409).json({
-      //     success: false,
-      //     message: 'Content for this URL already exists',
-      //     data: existingContent,
-      //   });
-      // }
+      const existingContent = await pageContentService.findByUrl(
+        rawContent.url
+      );
+      if (existingContent) {
+        return res.status(409).json({
+          success: false,
+          message: 'Content for this URL already exists',
+          data: existingContent,
+        });
+      }
+
+      try {
+        const extractedInfo = await extractPageInformation(rawContent.text);
+        rawContent.extractedInfo = extractedInfo;
+      } catch (extractError) {
+        logger.error('Error extracting page information:', extractError);
+      }
 
       const content = await pageContentService.create(rawContent);
       res.status(201).json({
@@ -34,25 +41,18 @@ export const pageContentController = {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
-    process.nextTick(async () => {
-      console.log('Processing next tick');
-      const res = await extractPageInformation(req.body?.text);
-      console.log(res);
-    });
   },
 
   async getByUrl(req: Request, res: Response) {
     try {
       const { url } = req.params;
       const content = await pageContentService.findByUrl(url);
-
       if (!content) {
         return res.status(404).json({
           success: false,
           message: 'Content not found',
         });
       }
-
       res.status(200).json({
         success: true,
         data: content,
@@ -88,20 +88,14 @@ export const pageContentController = {
     try {
       const { url } = req.params;
       const updateData = req.body;
-      const cleanedContent = await pageContentService.cleanContent(updateData);
 
-      const updatedContent = await pageContentService.update(
-        url,
-        cleanedContent
-      );
-
+      const updatedContent = await pageContentService.update(url, updateData);
       if (!updatedContent) {
         return res.status(404).json({
           success: false,
           message: 'Content not found',
         });
       }
-
       res.status(200).json({
         success: true,
         data: updatedContent,
@@ -120,14 +114,12 @@ export const pageContentController = {
     try {
       const { url } = req.params;
       const deleted = await pageContentService.delete(url);
-
       if (!deleted) {
         return res.status(404).json({
           success: false,
           message: 'Content not found',
         });
       }
-
       res.status(200).json({
         success: true,
         message: 'Content deleted successfully',

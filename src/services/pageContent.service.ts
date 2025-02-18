@@ -1,31 +1,63 @@
+import AIRequest from '../utils/aiRequest';
 import { IPageContent } from '../models/pageContent.model';
 import PageContentModel from '../models/pageContent.model';
-import AIRequest from '../utils/aiRequest';
 import prompts from '../utils/prompts';
 
+/**
+ * Interface for creating page content
+ */
 export interface CreatePageContent {
+  /** Page title */
   title: string;
+  /** Page text content */
   text: string;
+  /** Full URL of the page */
   url: string;
+  /** Base URL of the page */
   baseurl: string;
+  /** HTML content of the page */
   html: string;
+  /** Optional array of media URLs */
   media?: string[];
 }
 
+/**
+ * Service for managing page content operations
+ */
 export const pageContentService = {
+  /**
+   * Creates a new page content entry
+   * @param content - The content to be created
+   * @returns Promise resolving to the created page content
+   */
   async create(content: CreatePageContent): Promise<IPageContent> {
     const pageContent = new PageContentModel(content);
     return await pageContent.save();
   },
 
+  /**
+   * Finds page content by URL
+   * @param url - The URL to search for
+   * @returns Promise resolving to the found page content or null
+   */
   async findByUrl(url: string): Promise<IPageContent | null> {
     return await PageContentModel.findOne({ url });
   },
 
+  /**
+   * Retrieves all page contents
+   * @returns Promise resolving to an array of page contents
+   */
   async findAll(): Promise<IPageContent[]> {
     return await PageContentModel.find();
   },
 
+  /**
+   * Updates existing page content
+   * @param url - The URL of the content to update
+   * @param content - The new content data
+   * @returns Promise resolving to the updated content or null
+   */
   async update(
     url: string,
     content: Partial<CreatePageContent>
@@ -37,15 +69,22 @@ export const pageContentService = {
     );
   },
 
+  /**
+   * Deletes page content by URL
+   * @param url - The URL of the content to delete
+   * @returns Promise resolving to boolean indicating success
+   */
   async delete(url: string): Promise<boolean> {
     const result = await PageContentModel.deleteOne({ url });
     return result.deletedCount > 0;
   },
 
+  /**
+   * Cleans and normalizes content data
+   * @param content - The content to clean
+   * @returns Promise resolving to cleaned content
+   */
   async cleanContent(content: CreatePageContent): Promise<CreatePageContent> {
-    // Remove extra whitespace and normalize text
-    console.log(content);
-
     const cleanedContent = {
       ...content,
       text: content.text.trim().replace(/\s+/g, ' '),
@@ -53,7 +92,6 @@ export const pageContentService = {
       html: content.html.trim(),
     };
 
-    // Extract base URL from the full URL
     if (!cleanedContent.baseurl) {
       try {
         const url = new URL(content.url);
@@ -67,6 +105,11 @@ export const pageContentService = {
   },
 };
 
+/**
+ * Extracts structured information from page text using AI
+ * @param text - The text to analyze
+ * @returns Promise resolving to extracted information
+ */
 export const extractPageInformation = async (text: string) => {
   const response = await AIRequest('gpt-3.5-turbo', prompts.extract, text);
   return response;
