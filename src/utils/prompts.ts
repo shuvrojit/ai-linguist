@@ -1,5 +1,68 @@
+/**
+ * System prompts for AI interactions
+ *
+ * This module contains predefined prompts that guide the AI's behavior for
+ * different content processing tasks.
+ */
 const prompts = {
+  /**
+   * Prompt for converting HTML to meaningful text
+   * Used when raw HTML needs to be converted to clean, readable text
+   */
   htmlToMeaningfullText: 'Extract these html into meaningfull text',
+
+  /**
+   * Complex prompt for content analysis and categorization
+   *
+   * This prompt guides the AI to:
+   * 1. Analyze and categorize content (blog/job/scholarship)
+   * 2. Extract structured information based on content type
+   * 3. Return data in a consistent JSON format
+   *
+   * Output Format Examples:
+   *
+   * For Blogs:
+   * ```json
+   * {
+   *   "type": "blog",
+   *   "data": {
+   *     "title": string,
+   *     "author": string?,
+   *     "headings": string[]?,
+   *     "story": string
+   *   }
+   * }
+   * ```
+   *
+   * For Job Descriptions:
+   * ```json
+   * {
+   *   "type": "job",
+   *   "data": {
+   *     "company_title": string,
+   *     "job_position": string,
+   *     "job_location": string,
+   *     "job_type": "contract" | "full time" | "part time",
+   *     "workplace": "remote" | "on-site" | "hybrid",
+   *     "tech_stack": string[],
+   *     ...
+   *   }
+   * }
+   * ```
+   *
+   * For Scholarships:
+   * ```json
+   * {
+   *   "type": "scholarship",
+   *   "data": {
+   *     "scholarship_name": string,
+   *     "provider": string,
+   *     "benefits": object,
+   *     ...
+   *   }
+   * }
+   * ```
+   */
   extract: `
 You are given a text. Determine if the text is a blog, a job description, a university admission/scholarship, or falls into another category. Extract and output the relevant information in valid JSON using the following guidelines:
 
