@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-AI Linguist is a modern web application built with TypeScript, Express, and MongoDB that provides intelligent content analysis and processing capabilities. The project consists of both a backend API service and a browser extension.
+AI Linguist is a modern web application built with TypeScript, Express, and MongoDB that provides intelligent content analysis and processing capabilities through a RESTful API service.
 
 ## Architecture
 
@@ -12,7 +12,6 @@ AI Linguist is a modern web application built with TypeScript, Express, and Mong
 - **Project Structure**:
   ```
   src/
-  ├── api/          # API client implementations
   ├── config/       # Configuration files
   ├── controllers/  # Request handlers
   ├── models/       # MongoDB models
@@ -20,11 +19,6 @@ AI Linguist is a modern web application built with TypeScript, Express, and Mong
   ├── services/     # Business logic
   └── utils/        # Utility functions
   ```
-
-### Browser Extension
-
-- **Core Technologies**: React, TypeScript, Vite, TailwindCSS
-- **Features**: Content extraction, analysis, and storage
 
 ## Setup and Installation
 
@@ -55,14 +49,8 @@ NODE_ENV=development
    ```
 
 2. **Start Development Server**:
-
    ```bash
    yarn dev
-   ```
-
-3. **Start Extension Development**:
-   ```bash
-   yarn dev:extension
    ```
 
 ### Docker Setup
@@ -171,20 +159,6 @@ The application uses Winston for logging with different configurations for devel
   - `logs/combined.log`: All logs
   - `logs/exceptions.log`: Uncaught exceptions
 
-## Browser Extension Features
-
-### Content Processing
-
-- Extracts page content automatically
-- Supports text analysis and summarization
-- Integrates with the backend API for content storage
-
-### UI Components
-
-- Responsive design with TailwindCSS
-- Navigation system for saved content
-- Content display components
-
 ## Contributing
 
 1. Fork the repository
@@ -202,14 +176,6 @@ The application uses Winston for logging with different configurations for devel
 - `yarn start`: Start production server
 - `yarn lint`: Run ESLint
 - `yarn format`: Run Prettier
-
-### Extension
-
-- `yarn dev:web`: Start web development
-- `yarn dev:extension`: Start extension development
-- `yarn build:web`: Build web version
-- `yarn build:extension`: Build extension
-- `yarn build`: Build both web and extension
 
 ## Architecture Decisions
 

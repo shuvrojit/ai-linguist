@@ -1,12 +1,10 @@
 import { Request, Response } from 'express';
-import {
-  pageContentService,
-  extractPageInformation,
-} from '../services/pageContent.service';
+import { pageContentService } from '../services';
+import { PageContent } from '../types';
 import logger from '../config/logger';
 
 export const pageContentController = {
-  async create(req: Request, res: Response) {
+  async create(req: Request<{}, {}, PageContent>, res: Response) {
     try {
       const rawContent = req.body;
 
@@ -19,13 +17,6 @@ export const pageContentController = {
           message: 'Content for this URL already exists',
           data: existingContent,
         });
-      }
-
-      try {
-        const extractedInfo = await extractPageInformation(rawContent.text);
-        rawContent.extractedInfo = extractedInfo;
-      } catch (extractError) {
-        logger.error('Error extracting page information:', extractError);
       }
 
       const content = await pageContentService.create(rawContent);
@@ -43,7 +34,7 @@ export const pageContentController = {
     }
   },
 
-  async getByUrl(req: Request, res: Response) {
+  async getByUrl(req: Request<{ url: string }>, res: Response) {
     try {
       const { url } = req.params;
       const content = await pageContentService.findByUrl(url);
@@ -84,7 +75,10 @@ export const pageContentController = {
     }
   },
 
-  async update(req: Request, res: Response) {
+  async update(
+    req: Request<{ url: string }, {}, Partial<PageContent>>,
+    res: Response
+  ) {
     try {
       const { url } = req.params;
       const updateData = req.body;
@@ -110,7 +104,7 @@ export const pageContentController = {
     }
   },
 
-  async delete(req: Request, res: Response) {
+  async delete(req: Request<{ url: string }>, res: Response) {
     try {
       const { url } = req.params;
       const deleted = await pageContentService.delete(url);

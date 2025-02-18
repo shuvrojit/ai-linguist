@@ -26,25 +26,19 @@ export type ApiResponse<T = unknown> = {
 };
 
 /**
- * Interface for tab content structure
+ * Interface for page content metadata
  */
-export interface TabContent {
-  /** The main text content of the tab */
+export interface PageContent {
+  /** The main text content */
   text: string;
   /** The title of the page */
   title: string;
   /** The URL of the page */
   url: string;
-}
-
-/**
- * Interface for content state management
- */
-export interface ContentState {
-  /** Loading state indicator */
-  isLoading: boolean;
-  /** Error message if any */
-  error: string | null;
-  /** Current content data */
-  content: TabContent | null;
+  /** Base URL of the website */
+  baseurl: string;
+  /** HTML content of the page */
+  html: string;
+  /** Optional media URLs */
+  media?: string[];
 }
