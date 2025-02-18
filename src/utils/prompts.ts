@@ -35,11 +35,7 @@ Output keys:
 - eligibility_criteria (object with keys: affiliation, leadership_role, commitment, financial_requirement, future_commitment)
 - application_process (object with keys: apply_link and timeline (with application_open_date, application_deadline, and announcement_date))
 
-Other:
-Output:
-- raw_text (the original text)
-
-Return your answer strictly in JSON format.
+Return your answer strictly in JSON format. Output Example: {type: "job/blog/scholarship/other", data: {}}
 `,
 };
 
