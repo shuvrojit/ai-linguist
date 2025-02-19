@@ -3,6 +3,7 @@ import morganMiddleware from './config/morgan';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import v1Router from './routes/v1';
+import { errorHandler, notFound } from './middleware/errorHandler';
 
 const app: Express = express();
 
@@ -19,5 +20,11 @@ app.get('/', (_, res: Response) => {
 });
 
 app.use('/api', v1Router);
+
+// Handle 404s
+app.use(notFound);
+
+// Handle all errors
+app.use(errorHandler);
 
 export default app;
