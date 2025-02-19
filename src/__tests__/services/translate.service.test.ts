@@ -135,7 +135,7 @@ describe('Features Service', () => {
         _id: 'job123',
       });
 
-      const result = await featuresService.extractMeaning('sample job text');
+      const result = await featuresService.analyzeContent('sample job text');
 
       expect(AIRequest).toHaveBeenCalledWith(
         'gpt-4',
@@ -151,7 +151,7 @@ describe('Features Service', () => {
         JSON.stringify(mockBlogResponse)
       );
 
-      const result = await featuresService.extractMeaning('sample blog text');
+      const result = await featuresService.analyzeContent('sample blog text');
 
       expect(AIRequest).toHaveBeenCalledWith(
         'gpt-4',
@@ -165,7 +165,7 @@ describe('Features Service', () => {
     it('should handle AI service errors', async () => {
       (AIRequest as jest.Mock).mockRejectedValue(new Error('AI service error'));
 
-      await expect(featuresService.extractMeaning('test')).rejects.toThrow(
+      await expect(featuresService.analyzeContent('test')).rejects.toThrow(
         'AI service error'
       );
       expect(logger.error).toHaveBeenCalled();
@@ -174,7 +174,7 @@ describe('Features Service', () => {
     it('should handle invalid JSON response', async () => {
       (AIRequest as jest.Mock).mockResolvedValue('invalid json');
 
-      await expect(featuresService.extractMeaning('test')).rejects.toThrow(
+      await expect(featuresService.analyzeContent('test')).rejects.toThrow(
         'Invalid response format'
       );
     });
@@ -187,7 +187,7 @@ describe('Features Service', () => {
         new Error('DB error')
       );
 
-      const result = await featuresService.extractMeaning('sample job text');
+      const result = await featuresService.analyzeContent('sample job text');
 
       expect(result.category).toBe('job');
       expect(result.jobId).toBeUndefined();

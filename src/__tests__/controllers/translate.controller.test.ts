@@ -130,7 +130,7 @@ describe('Features Controller', () => {
     };
 
     it('should analyze content successfully', async () => {
-      (featuresService.extractMeaning as jest.Mock).mockResolvedValue(
+      (featuresService.analyzeContent as jest.Mock).mockResolvedValue(
         mockAnalyzeResult
       );
 
@@ -149,7 +149,7 @@ describe('Features Controller', () => {
 
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith(mockAnalyzeResult);
-      expect(featuresService.extractMeaning).toHaveBeenCalledWith(
+      expect(featuresService.analyzeContent).toHaveBeenCalledWith(
         'Sample documentation content'
       );
     });
@@ -174,7 +174,7 @@ describe('Features Controller', () => {
 
     it('should handle service errors', async () => {
       const mockError = new Error('Analysis failed');
-      (featuresService.extractMeaning as jest.Mock).mockRejectedValue(
+      (featuresService.analyzeContent as jest.Mock).mockRejectedValue(
         mockError
       );
 
