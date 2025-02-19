@@ -113,4 +113,88 @@ describe('Features Controller', () => {
       expect(mockResponse.json).toHaveBeenCalledWith(mockOverview);
     });
   });
+
+  describe('analyzeMeaning', () => {
+    const mockAnalyzeResult = {
+      category: 'technical',
+      type: 'documentation',
+      tags: ['typescript', 'api'],
+      metadata: {
+        title: 'API Documentation',
+        author: 'John Doe',
+      },
+      details: {
+        technology: 'TypeScript',
+        complexity_level: 'intermediate',
+      },
+    };
+
+    it('should analyze content successfully', async () => {
+      (featuresService.extractMeaning as jest.Mock).mockResolvedValue(
+        mockAnalyzeResult
+      );
+
+      mockRequest = {
+        body: {
+          content: {
+            text: 'Sample documentation content',
+          },
+        },
+      };
+
+      await featuresController.analyzeMeaning(
+        mockRequest as Request,
+        mockResponse as Response
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(mockAnalyzeResult);
+      expect(featuresService.extractMeaning).toHaveBeenCalledWith(
+        'Sample documentation content'
+      );
+    });
+
+    it('should handle missing content', async () => {
+      mockRequest = {
+        body: {},
+      };
+
+      await featuresController.analyzeMeaning(
+        mockRequest as Request,
+        mockResponse as Response
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(500);
+      expect(mockResponse.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          error: expect.any(Error),
+        })
+      );
+    });
+
+    it('should handle service errors', async () => {
+      const mockError = new Error('Analysis failed');
+      (featuresService.extractMeaning as jest.Mock).mockRejectedValue(
+        mockError
+      );
+
+      mockRequest = {
+        body: {
+          content: {
+            text: 'Sample content',
+          },
+        },
+      };
+
+      await featuresController.analyzeMeaning(
+        mockRequest as Request,
+        mockResponse as Response
+      );
+
+      expect(mockResponse.status).toHaveBeenCalledWith(500);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        error: mockError,
+      });
+    });
+  });
 });

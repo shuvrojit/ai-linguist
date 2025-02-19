@@ -125,6 +125,33 @@ Extract meaningful text
 - Body: `{ content: { text } }`
 - Response: Extracted text
 
+#### `POST /api/features/analyze`
+
+Analyze and categorize content with detailed extraction
+
+- Body: `{ content: { text } }`
+- Response:
+
+```json
+{
+  "category": "job|scholarship|blog|news|technical|other",
+  "type": "specific content type",
+  "tags": ["relevant tags"],
+  "metadata": {
+    "title": "string",
+    "author": "string",
+    "date": "string",
+    "source": "string"
+  },
+  "details": {
+    // Category-specific details
+  },
+  "sentiment": "positive|negative|neutral",
+  "complexity": "basic|intermediate|advanced",
+  "readability_score": "number"
+}
+```
+
 #### `POST /api/features/detailed-overview`
 
 Generate detailed content overview
