@@ -19,6 +19,10 @@ export interface IPageContent extends Document {
   html: string;
   /** Array of media URLs found on the page */
   media: string[];
+  /** Type of content */
+  contentType: 'article' | 'news' | 'blog' | 'resource' | 'other';
+  /** Additional metadata for flexible content categorization */
+  metadata?: Record<string, any>;
   /** Timestamp of document creation */
   createdAt: Date;
   /** Timestamp of last update */
@@ -62,6 +66,16 @@ const PageContentSchema: Schema<IPageContent> = new Schema(
     media: {
       type: [String],
       default: [],
+    },
+    contentType: {
+      type: String,
+      enum: ['article', 'news', 'blog', 'resource', 'other'],
+      required: [true, 'Content type is required'],
+    },
+    metadata: {
+      type: Map,
+      of: Schema.Types.Mixed,
+      default: {},
     },
   },
   {
