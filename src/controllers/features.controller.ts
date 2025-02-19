@@ -1,57 +1,23 @@
 import { Request, Response } from 'express';
 import { featuresService } from '../services';
-import axios from 'axios';
+import { asyncHandler } from '../utils/asyncHandler';
+import ApiError from '../utils/ApiError';
 
-// Remove unused imports and interfaces
+interface ContentRequest {
+  content: {
+    text: string;
+  };
+}
 
-export const summarize = async (req: Request, res: Response) => {
-  try {
-    const url: string = req.body?.url;
-    console.log(url);
-    const { data }: { data: string } = await axios.get(
-      `https://r.jina.ai/${url}`
-    );
-    console.log(data);
-    const summary = await featuresService.getSummary(data);
-    const result = await featuresService.extractMeaning(data);
+export const analyzeMeaning = asyncHandler(
+  async (req: Request<unknown, unknown, ContentRequest>, res: Response) => {
+    const text = req.body?.content?.text;
 
-    res.status(200).json({ summary, result });
-  } catch (err) {
-    res.status(500).json({ error: err });
-  }
-};
+    if (!text) {
+      throw new ApiError(400, 'Text content is required');
+    }
 
-export const overview = async (req: Request, res: Response) => {
-  try {
-    const url: string = req.body?.url;
-    const { data }: { data: string } = await axios.get(
-      `https://r.jina.ai/${url}`
-    );
-    const summary = await featuresService.detailOverview(data);
-    res.status(200).json(summary);
-  } catch (err) {
-    res.status(500).json({ error: err });
-  }
-};
-
-export const extractText = async (req: Request, res: Response) => {
-  try {
-    const text: string = req.body?.content.text;
-    const result = await featuresService.extractMeaningfullText(text);
-    res.status(200).json(result);
-  } catch (err) {
-    console.error('Error in extractText:', err);
-    res.status(500).json({ error: err });
-  }
-};
-
-export const analyzeMeaning = async (req: Request, res: Response) => {
-  try {
-    const text: string = req.body?.content.text;
     const result = await featuresService.extractMeaning(text);
     res.status(200).json(result);
-  } catch (err) {
-    console.error('Error in analyzeMeaning:', err);
-    res.status(500).json({ error: err });
   }
-};
+);
