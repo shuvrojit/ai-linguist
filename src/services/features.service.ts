@@ -1,7 +1,7 @@
 import AIRequest from '../utils/aiRequest';
 import ApiError from '../utils/ApiError';
 
-export const extractMeaning = async (text: string) => {
+export const analyzeContent = async (text: string) => {
   const systemPrompt = `You are an expert content analyzer. Extract meaningful information from the provided content 
   and categorize it appropriately based on its type and content. output only in json format. No markdown.`;
 
