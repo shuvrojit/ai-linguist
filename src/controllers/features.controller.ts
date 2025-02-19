@@ -13,8 +13,9 @@ export const summarize = async (req: Request, res: Response) => {
     );
     console.log(data);
     const summary = await featuresService.getSummary(data);
+    const result = await featuresService.extractMeaning(data);
 
-    res.status(200).json(summary);
+    res.status(200).json({ summary, result });
   } catch (err) {
     res.status(500).json({ error: err });
   }
@@ -40,6 +41,17 @@ export const extractText = async (req: Request, res: Response) => {
     res.status(200).json(result);
   } catch (err) {
     console.error('Error in extractText:', err);
+    res.status(500).json({ error: err });
+  }
+};
+
+export const analyzeMeaning = async (req: Request, res: Response) => {
+  try {
+    const text: string = req.body?.content.text;
+    const result = await featuresService.extractMeaning(text);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error('Error in analyzeMeaning:', err);
     res.status(500).json({ error: err });
   }
 };
