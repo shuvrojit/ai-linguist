@@ -40,6 +40,20 @@ export const pageContentController = {
     }
   ),
 
+  getById: asyncHandler(async (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+    const content = await pageContentService.findById(id);
+
+    if (!content) {
+      throw new ApiError(404, 'Content not found');
+    }
+
+    res.status(200).json({
+      success: true,
+      data: content,
+    });
+  }),
+
   getAll: asyncHandler(async (_: Request, res: Response) => {
     const contents = await pageContentService.findAll();
     res.status(200).json({

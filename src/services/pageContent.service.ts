@@ -45,6 +45,15 @@ export const pageContentService = {
   },
 
   /**
+   * Finds page content by ID
+   * @param id - MongoDB ObjectId as string
+   * @returns Promise resolving to the found page content or null
+   */
+  async findById(id: string): Promise<IPageContent | null> {
+    return await PageContentModel.findById(id);
+  },
+
+  /**
    * Retrieves all page contents
    * @returns Promise resolving to an array of page contents
    */
