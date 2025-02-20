@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
-import { featuresService } from '../services';
+import { featuresService, pageContentService } from '../services';
 import { asyncHandler } from '../utils/asyncHandler';
 import ApiError from '../utils/ApiError';
 
@@ -39,5 +39,19 @@ export const extract = asyncHandler(
     );
 
     res.status(200).json({ content: data });
+  }
+);
+
+export const analyzeById = asyncHandler(
+  async (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+
+    const pageContent = await pageContentService.findById(id);
+    if (!pageContent) {
+      throw new ApiError(404, 'Page content not found');
+    }
+
+    const result = await featuresService.analyzeContent(pageContent.text);
+    res.status(200).json(result);
   }
 );

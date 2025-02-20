@@ -20,7 +20,7 @@ export interface IPageContent extends Document {
   /** Array of media URLs found on the page */
   media: string[];
   /** Type of content */
-  contentType: 'article' | 'news' | 'blog' | 'resource' | 'other';
+  contentType?: 'article' | 'news' | 'blog' | 'resource' | 'other';
   /** Additional metadata for flexible content categorization */
   metadata?: Record<string, any>;
   /** Timestamp of document creation */
@@ -70,7 +70,6 @@ const PageContentSchema: Schema<IPageContent> = new Schema(
     contentType: {
       type: String,
       enum: ['article', 'news', 'blog', 'resource', 'other'],
-      required: [true, 'Content type is required'],
     },
     metadata: {
       type: Map,
