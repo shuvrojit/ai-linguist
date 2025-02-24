@@ -4,6 +4,6 @@ import { featuresController } from '../../controllers';
 const featureRouter = Router();
 
 featureRouter.post('/analyze', featuresController.analyzeMeaning);
-featureRouter.get('/analyze/:id', featuresController.analyzeById);
+featureRouter.post('/analyze-by-id', featuresController.analyzeById);
 
 export default featureRouter;

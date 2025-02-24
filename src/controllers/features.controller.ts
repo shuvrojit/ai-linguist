@@ -44,9 +44,12 @@ export const extract = asyncHandler(
 
 export const analyzeById = asyncHandler(
   async (req: Request<{ id: string }>, res: Response) => {
-    const { id } = req.params;
+    const { id } = req.body;
+    console.log(id);
 
     const pageContent = await pageContentService.findById(id);
+    console.log(pageContent);
+
     if (!pageContent) {
       throw new ApiError(404, 'Page content not found');
     }
