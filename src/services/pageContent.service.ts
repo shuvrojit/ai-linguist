@@ -1,3 +1,4 @@
+import { Types } from 'mongoose';
 import AIRequest from '../utils/aiRequest';
 import { IPageContent } from '../models/pageContent.model';
 import PageContentModel from '../models/pageContent.model';
@@ -19,6 +20,10 @@ export interface CreatePageContent {
   html: string;
   /** Optional array of media URLs */
   media?: string[];
+  /** Content type */
+  contentType?: 'article' | 'news' | 'blog' | 'resource' | 'other';
+  /** Additional metadata */
+  metadata?: Record<string, any>;
 }
 
 /**
@@ -46,10 +51,10 @@ export const pageContentService = {
 
   /**
    * Finds page content by ID
-   * @param id - MongoDB ObjectId as string
+   * @param id - MongoDB ObjectId string or ObjectId
    * @returns Promise resolving to the found page content or null
    */
-  async findById(id: string): Promise<IPageContent | null> {
+  async findById(id: string | Types.ObjectId): Promise<IPageContent | null> {
     return await PageContentModel.findById(id);
   },
 
@@ -86,6 +91,25 @@ export const pageContentService = {
   async delete(url: string): Promise<boolean> {
     const result = await PageContentModel.deleteOne({ url });
     return result.deletedCount > 0;
+  },
+
+  /**
+   * Analyzes page content and stores results in metadata
+   * @param id - MongoDB ObjectId string or ObjectId
+   * @returns Promise resolving to the updated page content or null
+   */
+  async analyzeContent(
+    id: string | Types.ObjectId
+  ): Promise<IPageContent | null> {
+    const content = await this.findById(id);
+    if (!content) return null;
+
+    const analysis = await extractPageInformation(content.text);
+    return await PageContentModel.findByIdAndUpdate(
+      id,
+      { $set: { metadata: { analysis } } },
+      { new: true }
+    );
   },
 
   /**

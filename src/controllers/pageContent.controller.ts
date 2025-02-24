@@ -1,12 +1,16 @@
 import { Request, Response } from 'express';
-import { pageContentService } from '../services';
-import { PageContent } from '../types';
+import {
+  pageContentService,
+  CreatePageContent,
+} from '../services/pageContent.service';
 import { asyncHandler } from '../utils/asyncHandler';
 import ApiError from '../utils/ApiError';
+import { IPageContent } from '../models/pageContent.model';
+import { featuresController } from '.';
 
 export const pageContentController = {
   create: asyncHandler(
-    async (req: Request<{}, {}, PageContent>, res: Response) => {
+    async (req: Request<{}, {}, CreatePageContent>, res: Response) => {
       const rawContent = req.body;
 
       const existingContent = await pageContentService.findByUrl(
@@ -16,10 +20,51 @@ export const pageContentController = {
         throw new ApiError(409, 'Content for this URL already exists');
       }
 
-      const content = await pageContentService.create(rawContent);
+      // Clean content before saving
+      //const cleanedContent = await pageContentService.cleanContent(rawContent);
+
+      const content = (await pageContentService.create(
+        rawContent
+      )) as IPageContent & { _id: { toString(): string } };
+
       res.status(201).json({
         success: true,
         data: content,
+        message: 'Content saved successfully',
+      });
+
+      // Handle analysis in background
+      process.nextTick(async () => {
+        try {
+          // Create a properly typed mock Response object
+          const mockRes = {
+            json: () => {},
+            status: () => ({ json: () => {} }),
+            sendStatus: () => {},
+            links: () => {},
+            send: () => {},
+            jsonp: () => {},
+            // Add other required Response methods as no-ops
+            get: () => '',
+            set: () => mockRes,
+            header: () => mockRes,
+            cookie: () => mockRes,
+          } as unknown as Response;
+
+          const mockNext = () => {};
+
+          await featuresController.analyzeById(
+            {
+              body: { id: content._id.toString() },
+              params: { id: content._id.toString() },
+            } as Request<{ id: string }>,
+            mockRes,
+            mockNext
+          );
+          console.log('Content saved and analyzed successfully');
+        } catch (error) {
+          console.error('Error analyzing content:', error);
+        }
       });
     }
   ),
@@ -64,7 +109,7 @@ export const pageContentController = {
 
   update: asyncHandler(
     async (
-      req: Request<{ url: string }, {}, Partial<PageContent>>,
+      req: Request<{ url: string }, {}, Partial<CreatePageContent>>,
       res: Response
     ) => {
       const { url } = req.params;
