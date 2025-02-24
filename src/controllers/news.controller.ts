@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import * as newsService from '../services/news.service';
 import { asyncHandler } from '../utils/asyncHandler';
-import ApiError from '../utils/ApiError';
 
 /**
  * Create a new news article
