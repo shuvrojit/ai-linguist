@@ -1,43 +1,126 @@
+import { FilterQuery, UpdateQuery } from 'mongoose';
 import { JobDescriptionModel } from '../models';
-import type { IJobDescription } from '../models/jobDescription.model';
-import { Types } from 'mongoose';
+import { IJobDescription } from '../models/jobDescription.model';
+import ApiError from '../utils/ApiError';
 
-export const createJob = async (jobData: IJobDescription) => {
+/**
+ * Create a new job description
+ */
+export const createJobDescription = async (
+  jobData: Partial<IJobDescription>
+): Promise<IJobDescription> => {
   return JobDescriptionModel.create(jobData);
 };
 
-export const getAllJobs = async () => {
-  return JobDescriptionModel.find<IJobDescription>({});
+/**
+ * Get job description by ID
+ */
+export const getJobDescriptionById = async (
+  id: string
+): Promise<IJobDescription | null> => {
+  const jobDescription = await JobDescriptionModel.findById(id);
+  if (!jobDescription) {
+    throw new ApiError(404, 'Job description not found');
+  }
+  return jobDescription;
 };
 
-export const getJobById = async (id: string) => {
-  return JobDescriptionModel.findById<IJobDescription>(new Types.ObjectId(id));
-};
-
-export const updateJob = async (
+/**
+ * Update job description by ID
+ */
+export const updateJobDescriptionById = async (
   id: string,
-  updateData: Partial<IJobDescription>
-) => {
-  return JobDescriptionModel.findByIdAndUpdate<IJobDescription>(
-    new Types.ObjectId(id),
+  updateData: UpdateQuery<IJobDescription>
+): Promise<IJobDescription | null> => {
+  const jobDescription = await JobDescriptionModel.findByIdAndUpdate(
+    id,
     updateData,
-    { new: true }
+    {
+      new: true,
+      runValidators: true,
+    }
   );
+
+  if (!jobDescription) {
+    throw new ApiError(404, 'Job description not found');
+  }
+  return jobDescription;
 };
 
-export const deleteJob = async (id: string) => {
-  return JobDescriptionModel.findByIdAndDelete<IJobDescription>(
-    new Types.ObjectId(id)
-  );
+/**
+ * Delete job description by ID
+ */
+export const deleteJobDescriptionById = async (
+  id: string
+): Promise<IJobDescription | null> => {
+  const jobDescription = await JobDescriptionModel.findByIdAndDelete(id);
+  if (!jobDescription) {
+    throw new ApiError(404, 'Job description not found');
+  }
+  return jobDescription;
 };
 
-export const searchJobs = async (query: string) => {
-  return JobDescriptionModel.find<IJobDescription>({
-    $or: [
-      { company_title: { $regex: query, $options: 'i' } },
-      { job_position: { $regex: query, $options: 'i' } },
-      { job_location: { $regex: query, $options: 'i' } },
-      { tech_stack: { $in: [new RegExp(query, 'i')] } },
-    ],
-  });
+/**
+ * Get job descriptions with optional filtering
+ */
+export const getJobDescriptions = async (
+  filter: FilterQuery<IJobDescription> = {},
+  options: {
+    limit?: number;
+    page?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  } = {}
+): Promise<{
+  jobDescriptions: IJobDescription[];
+  page: number;
+  limit: number;
+  totalPages: number;
+  totalResults: number;
+}> => {
+  const {
+    limit = 10,
+    page = 1,
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
+  } = options;
+  const skip = (page - 1) * limit;
+
+  const [jobDescriptions, totalResults] = await Promise.all([
+    JobDescriptionModel.find(filter)
+      .sort({ [sortBy]: sortOrder })
+      .skip(skip)
+      .limit(limit),
+    JobDescriptionModel.countDocuments(filter),
+  ]);
+
+  const totalPages = Math.ceil(totalResults / limit);
+
+  return {
+    jobDescriptions,
+    page,
+    limit,
+    totalPages,
+    totalResults,
+  };
+};
+
+/**
+ * Get active job descriptions
+ */
+export const getActiveJobs = async (
+  options: {
+    limit?: number;
+    page?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  } = {}
+): Promise<{
+  jobDescriptions: IJobDescription[];
+  page: number;
+  limit: number;
+  totalPages: number;
+  totalResults: number;
+}> => {
+  return getJobDescriptions({ status: 'active' }, options);
 };
