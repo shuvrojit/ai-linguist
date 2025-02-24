@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-AI Linguist is a modern web application built with TypeScript, Express, and MongoDB that provides intelligent content analysis and processing capabilities through a RESTful API service.
+AI Linguist is an advanced natural language processing platform built with TypeScript, Express, and MongoDB. It leverages state-of-the-art AI models to provide intelligent content analysis, language processing, and text transformation capabilities through a RESTful API service.
 
 ## Architecture
 
@@ -75,60 +75,48 @@ yarn docker:test
 
 ## API Documentation
 
-### Content Category Routes
+### Language Processing Routes
 
-The API provides specialized endpoints for different content categories:
+The API provides specialized endpoints for different language processing tasks:
 
-- `/api/v1/blog` - Blog content management
-- `/api/v1/news` - News article management
-- `/api/v1/technical` - Technical content
-- `/api/v1/job-description` - Job posting management
-- `/api/v1/scholarship` - Scholarship information
-- `/api/v1/other` - Other content types
+- `/api/v1/analyze` - Content analysis and classification
+- `/api/v1/transform` - Text transformation and enhancement
+- `/api/v1/translate` - Multi-language translation
+- `/api/v1/summarize` - Content summarization
+- `/api/v1/extract` - Key information extraction
+- `/api/v1/sentiment` - Sentiment analysis
 
-Each category route supports standard CRUD operations:
+Each route supports specialized operations:
 
-- `GET /` - List all items
-- `GET /:id` - Get specific item
-- `POST /` - Create new item
-- `PUT /:id` - Update item
-- `DELETE /:id` - Delete item
+- `POST /analyze` - Deep content analysis
+- `POST /transform` - Text transformation
+- `POST /translate` - Language translation
+- `POST /summarize` - Generate summaries
+- `POST /extract` - Extract key information
+- `POST /sentiment` - Analyze sentiment
 
-### Page Content Endpoints
+### AI Features Endpoints
 
-#### `POST /api/page-content`
+#### `POST /api/ai/analyze`
 
-Create new page content
+Perform comprehensive content analysis
 
-- Body: `{ title, text, url, html, media? }`
-- Response: `{ success, data }`
+- Body: `{ text, options?: AnalysisOptions }`
+- Response: `{ analysis, metadata, confidence }`
 
-#### `GET /api/page-content`
+#### `POST /api/ai/transform`
 
-Get all page contents
+Transform content using AI
 
-- Response: `{ success, data }`
+- Body: `{ text, style: TransformationStyle, tone?: string }`
+- Response: `{ transformed_text, changes }`
 
-#### `GET /api/page-content/:url`
+#### `POST /api/ai/translate`
 
-Get content by URL
+AI-powered translation
 
-- Response: `{ success, data }`
-
-#### `PUT /api/page-content/:url`
-
-Update content
-
-- Body: `{ title?, text?, html?, media? }`
-- Response: `{ success, data }`
-
-#### `DELETE /api/page-content/:url`
-
-Delete content
-
-- Response: `{ success, message }`
-
-### Features Endpoints
+- Body: `{ text, source_lang, target_lang, preserve_style?: boolean }`
+- Response: `{ translation, confidence }`
 
 #### `POST /api/features/summary`
 
@@ -177,6 +165,27 @@ Generate detailed content overview
 
 - Body: `{ url }`
 - Response: Overview HTML
+
+## AI Processing Pipeline
+
+The application implements a sophisticated AI processing pipeline:
+
+1. Text Preprocessing
+
+   - Tokenization
+   - Normalization
+   - Entity Recognition
+
+2. AI Model Integration
+
+   - OpenAI GPT models
+   - Custom fine-tuned models
+   - Specialized language models
+
+3. Post-processing
+   - Format standardization
+   - Quality checks
+   - Confidence scoring
 
 ## Testing
 
