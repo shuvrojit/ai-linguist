@@ -75,96 +75,78 @@ yarn docker:test
 
 ## API Documentation
 
-### Language Processing Routes
+All API endpoints are prefixed with `/api/v1`.
 
-The API provides specialized endpoints for different language processing tasks:
+### Features Routes
 
-- `/api/v1/analyze` - Content analysis and classification
-- `/api/v1/transform` - Text transformation and enhancement
-- `/api/v1/translate` - Multi-language translation
-- `/api/v1/summarize` - Content summarization
-- `/api/v1/extract` - Key information extraction
-- `/api/v1/sentiment` - Sentiment analysis
+- `POST /features/analyze` - Analyze content meaning
+- `POST /features/analyze-by-id` - Analyze content by ID
 
-Each route supports specialized operations:
+### Page Content Routes
 
-- `POST /analyze` - Deep content analysis
-- `POST /transform` - Text transformation
-- `POST /translate` - Language translation
-- `POST /summarize` - Generate summaries
-- `POST /extract` - Extract key information
-- `POST /sentiment` - Analyze sentiment
+- `POST /page-content` - Create new page content
+- `GET /page-content` - Get all page content
+- `GET /page-content/id/:id` - Get page content by ID
+- `GET /page-content/:url` - Get page content by URL
+- `PUT /page-content/:url` - Update page content
+- `DELETE /page-content/:url` - Delete page content
 
-### AI Features Endpoints
+### Job Description Routes
 
-#### `POST /api/ai/analyze`
+- `POST /jobs` - Create new job description
+- `GET /jobs` - Get all job descriptions
+- `GET /jobs/active` - Get active job listings
+- `GET /jobs/:id` - Get job description by ID
+- `PATCH /jobs/:id` - Update job description
+- `DELETE /jobs/:id` - Delete job description
 
-Perform comprehensive content analysis
+### Scholarship Routes
 
-- Body: `{ text, options?: AnalysisOptions }`
-- Response: `{ analysis, metadata, confidence }`
+- `POST /scholarships` - Create new scholarship
+- `GET /scholarships` - Get all scholarships
+- `GET /scholarships/active` - Get active scholarships
+- `GET /scholarships/country/:country` - Get scholarships by country
+- `GET /scholarships/:id` - Get scholarship by ID
+- `PATCH /scholarships/:id` - Update scholarship
+- `DELETE /scholarships/:id` - Delete scholarship
 
-#### `POST /api/ai/transform`
+### Blog Routes
 
-Transform content using AI
+- `POST /blogs` - Create new blog post
+- `GET /blogs` - Get all blog posts
+- `GET /blogs/:id` - Get blog post by ID
+- `PATCH /blogs/:id` - Update blog post
+- `DELETE /blogs/:id` - Delete blog post
 
-- Body: `{ text, style: TransformationStyle, tone?: string }`
-- Response: `{ transformed_text, changes }`
+### News Routes
 
-#### `POST /api/ai/translate`
+- `POST /news` - Create news article
+- `GET /news` - Get all news articles
+- `GET /news/breaking` - Get breaking news
+- `GET /news/category/:category` - Get news by category
+- `GET /news/:id` - Get news article by ID
+- `PATCH /news/:id` - Update news article
+- `DELETE /news/:id` - Delete news article
 
-AI-powered translation
+### Technical Content Routes
 
-- Body: `{ text, source_lang, target_lang, preserve_style?: boolean }`
-- Response: `{ translation, confidence }`
+- `POST /technical` - Create technical content
+- `GET /technical` - Get all technical content
+- `GET /technical/technology/:technology` - Get content by technology
+- `GET /technical/complexity/:level` - Get content by complexity level
+- `GET /technical/:id` - Get technical content by ID
+- `PATCH /technical/:id` - Update technical content
+- `DELETE /technical/:id` - Delete technical content
 
-#### `POST /api/features/summary`
+### Other Content Routes
 
-Generate content summary
-
-- Body: `{ url }`
-- Response: Summary HTML
-
-#### `POST /api/features/extract`
-
-Extract meaningful text
-
-- Body: `{ content: { text } }`
-- Response: Extracted text
-
-#### `POST /api/features/analyze`
-
-Analyze and categorize content with detailed extraction
-
-- Body: `{ content: { text } }`
-- Response:
-
-```json
-{
-  "category": "job|scholarship|blog|news|technical|other",
-  "type": "specific content type",
-  "tags": ["relevant tags"],
-  "metadata": {
-    "title": "string",
-    "author": "string",
-    "date": "string",
-    "source": "string"
-  },
-  "details": {
-    // Category-specific details
-  },
-  "sentiment": "positive|negative|neutral",
-  "complexity": "basic|intermediate|advanced",
-  "readability_score": "number"
-}
-```
-
-#### `POST /api/features/detailed-overview`
-
-Generate detailed content overview
-
-- Body: `{ url }`
-- Response: Overview HTML
+- `POST /other` - Create other content
+- `GET /other` - Get all other content
+- `GET /other/type/:type` - Get content by type
+- `GET /other/complexity/:level` - Get content by complexity level
+- `GET /other/:id` - Get content by ID
+- `PATCH /other/:id` - Update content
+- `DELETE /other/:id` - Delete content
 
 ## AI Processing Pipeline
 
