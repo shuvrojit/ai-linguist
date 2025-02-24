@@ -58,7 +58,7 @@ export const pageContentController = {
     const contents = await pageContentService.findAll();
     res.status(200).json({
       success: true,
-      data: contents,
+      links: contents,
     });
   }),
 
