@@ -25,8 +25,8 @@ AI Linguist is a modern web application built with TypeScript, Express, and Mong
 ### Prerequisites
 
 - Node.js (v20+ recommended)
-- MongoDB (v6+)
-- npm or yarn
+- MongoDB (v8+)
+- yarn or npm
 - Docker (optional)
 
 ### Environment Variables
@@ -74,6 +74,25 @@ yarn docker:test
 ```
 
 ## API Documentation
+
+### Content Category Routes
+
+The API provides specialized endpoints for different content categories:
+
+- `/api/v1/blog` - Blog content management
+- `/api/v1/news` - News article management
+- `/api/v1/technical` - Technical content
+- `/api/v1/job-description` - Job posting management
+- `/api/v1/scholarship` - Scholarship information
+- `/api/v1/other` - Other content types
+
+Each category route supports standard CRUD operations:
+
+- `GET /` - List all items
+- `GET /:id` - Get specific item
+- `POST /` - Create new item
+- `PUT /:id` - Update item
+- `DELETE /:id` - Delete item
 
 ### Page Content Endpoints
 
@@ -172,7 +191,27 @@ yarn test:watch
 
 # Generate coverage report
 yarn coverage
+
+# Generate coverage report for Coveralls
+yarn coverage:coveralls
 ```
+
+## Code Quality Tools
+
+The project maintains high code quality standards through:
+
+### Linting and Formatting
+
+- ESLint with TypeScript support
+- Prettier for consistent code formatting
+- Pre-commit hooks using Husky and lint-staged
+
+### Available Scripts
+
+- `yarn lint`: Run ESLint
+- `yarn lint:fix`: Fix ESLint issues
+- `yarn format`: Check formatting with Prettier
+- `yarn format:fix`: Fix formatting issues
 
 ## Logging
 
@@ -196,13 +235,29 @@ The application uses Winston for logging with different configurations for devel
 
 ## Scripts
 
-### Backend
+### Development
 
-- `yarn dev`: Start development server
-- `yarn build`: Build production version
-- `yarn start`: Start production server
+- `yarn dev`: Start development server with nodemon
+- `yarn build`: Build TypeScript to JavaScript
+- `yarn start`: Start production server with PM2
+- `yarn start:prod`: Start production server without daemon mode
+
+### Docker
+
+- `yarn docker:dev`: Start development environment
+- `yarn docker:prod`: Build and start production environment
+- `yarn docker:test`: Run tests in Docker environment
+
+### Testing and Quality
+
+- `yarn test`: Run Jest tests
+- `yarn test:watch`: Run tests in watch mode
+- `yarn coverage`: Generate test coverage
+- `yarn coverage:coveralls`: Generate coverage for Coveralls
 - `yarn lint`: Run ESLint
-- `yarn format`: Run Prettier
+- `yarn lint:fix`: Fix ESLint issues
+- `yarn format`: Check Prettier formatting
+- `yarn format:fix`: Fix Prettier formatting issues
 
 ## Architecture Decisions
 
