@@ -49,9 +49,13 @@ export const analyzeContent = async (text: string) => {
       "complexity": "basic|intermediate|advanced",
       "readability_score": 0-100
     }
+    
+    If there are multiple categories that apply, provide details for each category.
+    If there are more details that can be extracted, include them in one object named extra data.
+
+    Output: Only JSON format. No markdown.
 
     Text to analyze: ${text}
-    output only json in format. No markdown 
 `;
 
   const response = await AIRequest('gpt-4o', systemPrompt, userPrompt);
