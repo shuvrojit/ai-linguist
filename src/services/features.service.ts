@@ -43,15 +43,27 @@ export const analyzeContent = async (text: string) => {
         "technology": "main technology/framework",
         "complexity_level": "beginner|intermediate|advanced",
         "code_snippets": [ ],
-        "prerequisites": [ ]
+        "prerequisites": [ ],
+        "target_audience": "intended audience"
       },
       "sentiment": "positive|negative|neutral",
       "complexity": "basic|intermediate|advanced",
-      "readability_score": 0-100
+      "readability_score": 0-100,
+      "extra_data": {
+        // Any additional information that doesn't fit the above structure
+        // This could include custom fields specific to the content
+        // For example:
+        // - Job: hiring_process, compensation_details, remote_work_policy
+        // - Scholarship: selection_process, visa_requirements, special_conditions
+        // - Blog: references, related_articles, comment_policy
+        // - News: sources, related_stories, fact_check_status
+        // - Technical: version_info, system_requirements, license_info
+        // - Other: any content-specific details
+      }
     }
     
     If there are multiple categories that apply, provide details for each category.
-    If there are more details that can be extracted, include them in one object named extra data.
+    Important: Store any detected information that doesn't fit into the predefined structure in the extra_data object.
 
     Output: Only JSON format. No markdown.
 
