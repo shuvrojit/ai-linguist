@@ -5,71 +5,44 @@
  * different content processing tasks.
  */
 const prompts = {
-  analyze: `You are an expert content analyzer. Extract meaningful information from the provided content 
-  and categorize it appropriately based on its type and content. output only in json format. No markdown.
-Analyze the following text and extract structured information. 
-    Determine the content type (job posting, scholarship/admission, blog article, news, technical documentation, or other) 
-    and extract relevant details. Return the result in this format:
+  analyze: `You are an expert content analyzer. Your task is to analyze the provided text and extract structured, meaningful information. Focus on three primary content types: Job postings, Scholarship/Admission announcements, and General content for all other cases. Use the following JSON structure as a guide for your output. If the content does not fit one of the specific types, use the 'general' section. Any additional information that doesn't clearly belong in one of the predefined fields should be stored in the 'extra_data' field. Output only valid JSON with no markdown formatting.
+Base for all category:
+three categories: job, scholarship/admission, content
+{category, type, tags}
+Job Example:
 
-    {
-      "category": "job|scholarship|blog|news|technical|other",
-      "type": "specific type (e.g., job posting, news article, tutorial)",
-      "tags": ["relevant", "topic", "tags"],
-      "metadata": {
-        "title": "content title",
-        "author": "author if available",
-        "date": "publication/posting date if available",
-        "source": "content source if available"
-      },
-      "details": {
-        // For Job Postings:
-        "company_info": { name, location, culture },
-        "position_details": { title, type, workplace, experience_required },
-        "requirements": [ ],
-        "responsibilities": [ ],
-        "tech_stack": [ ],
-        
-        // For Scholarships/Admissions:
-        "program_info": { name, provider, type },
-        "benefits": { financial, academic, other },
-        "requirements": { },
-        "deadlines": { },
-        
-        // For Blog/News:
-        "summary": "brief summary",
-        "key_points": [ ],
-        "topics_covered": [ ],
-        "target_audience": "intended audience",
-        
-        // For Technical Content:
-        "technology": "main technology/framework",
-        "complexity_level": "beginner|intermediate|advanced",
-        "code_snippets": [ ],
-        "prerequisites": [ ],
-        "target_audience": "intended audience"
-      },
-      "sentiment": "positive|negative|neutral",
-      "complexity": "basic|intermediate|advanced",
-      "readability_score": 0-100,
-      "extra_data": {
-        // Any additional information that doesn't fit the above structure
-        // This could include custom fields specific to the content
-        // For example:
-        // - Job: hiring_process, compensation_details, remote_work_policy
-        // - Scholarship: selection_process, visa_requirements, special_conditions
-        // - Blog: references, related_articles, comment_policy
-        // - News: sources, related_stories, fact_check_status
-        // - Technical: version_info, system_requirements, license_info
-        // - Other: any content-specific details
-      }
-    }
-    
-    If there are multiple categories that apply, provide details for each category.
-    Important: Store any detected information that doesn't fit into the predefined structure in the extra_data object.
+company_title?: string;
+  /** Job position/title */
+  job_position?: string;
+  /** Job location */
+  job_location?: string;
+  /** Type of employment */
+  job_type: 'contract' | 'full time' | 'part time';
+  /** Work environment type */
+  workplace?: 'remote' | 'on-site' | 'hybrid';
+  /** Application deadline */
+  due_date?: Date;
+  /** Required technical skills */
+  tech_stack: string[];
+  /** Job responsibilities */
+  responsibilities?: string[];
+  /** Years of professional experience required */
+  professional_experience?: number;
+  contact_email?: string;
+  /** Job requirements */
+  requirements?: string[];
+  /** Additional desired skills */
+  additional_skills?: string[];
+  /** Company culture description */
+  company_culture?: string;
+  /** Job posting status */
+  status: 'active' | 'filled' | 'expired' | 'draft';
+  /** Salary range/information */
+  salary?: string;
+  /** Additional metadata */
+  additional_info?: Record<string, any>;
 
-    Output: Only JSON format. No markdown.
-
-    Text to analyze: 
+Response in json output only. No markdown.
 `,
   /**
    * Prompt for converting HTML to meaningful text

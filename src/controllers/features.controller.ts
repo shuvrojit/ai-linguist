@@ -56,45 +56,18 @@ export const analyzeById = asyncHandler(
     console.log(id);
 
     const pageContent = await pageContentService.findById(id);
-    console.log(pageContent);
 
     if (!pageContent) {
       throw new ApiError(404, 'Page content not found');
     }
 
     const result = await featuresService.analyzeContent(pageContent.text);
-
     // Save to appropriate collection based on category
+    console.log(result);
     let savedContent;
     switch (result.category) {
       case 'job':
-        savedContent = await JobDescriptionModel.create({
-          company_title: result.details.company_info?.name || 'Unknown',
-          job_position:
-            result.details.position_details?.title || 'Unknown Position',
-          job_location:
-            result.details.company_info?.location || 'Not Specified',
-          job_type:
-            result.details.position_details?.type?.toLowerCase() || 'full time',
-          workplace:
-            result.details.position_details?.workplace?.toLowerCase() ||
-            'on-site',
-          due_date: new Date(result.metadata?.date || Date.now()),
-          tech_stack: result.details.tech_stack || [],
-          responsibilities: result.details.responsibilities || [],
-          professional_experience:
-            result.details.position_details?.experience_required || 0,
-          requirements: result.details.requirements || [],
-          company_culture:
-            result.details.company_info?.culture || 'Not specified',
-          status: 'active',
-          additional_info: {
-            original_content_id: pageContent._id,
-            metadata: result.metadata,
-            tags: result.tags,
-          },
-          extra_data: result.extra_data || {},
-        });
+        savedContent = await JobDescriptionModel.create(result);
         break;
 
       case 'scholarship':

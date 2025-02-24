@@ -8,10 +8,12 @@ export const analyzeContent = async (text: string) => {
   if (!response) {
     throw new ApiError(500, 'No response from AI service');
   }
+  const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/);
 
-  try {
-    return JSON.parse(response);
-  } catch (parseError) {
+  if (!jsonMatch) {
     throw new ApiError(500, 'Invalid response format from AI service');
   }
+  const jsonData = JSON.parse(jsonMatch[1]);
+  console.log(jsonData);
+  return jsonData;
 };

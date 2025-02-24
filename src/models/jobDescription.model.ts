@@ -19,6 +19,8 @@ export interface IJobDescription extends Document {
   responsibilities?: string[];
   /** Years of professional experience required */
   professional_experience?: number;
+  // add a contact email field
+  contact_email?: string;
   /** Job requirements */
   requirements?: string[];
   /** Additional desired skills */
@@ -31,6 +33,8 @@ export interface IJobDescription extends Document {
   salary?: string;
   /** Additional metadata */
   additional_info?: Record<string, any>;
+  /** Extra dynamic data */
+  extra_data?: Record<string, any>;
   /** Creation timestamp */
   createdAt: Date;
   /** Last update timestamp */
@@ -65,6 +69,7 @@ const jobDescriptionSchema = new Schema<IJobDescription>(
     tech_stack: [{ type: String, required: true }],
     responsibilities: [{ type: String }],
     professional_experience: { type: Number },
+    contact_email: { type: String },
     requirements: [{ type: String }],
     additional_skills: [{ type: String }],
     company_culture: { type: String },
@@ -79,6 +84,11 @@ const jobDescriptionSchema = new Schema<IJobDescription>(
       trim: true,
     },
     additional_info: {
+      type: Map,
+      of: Schema.Types.Mixed,
+      default: {},
+    },
+    extra_data: {
       type: Map,
       of: Schema.Types.Mixed,
       default: {},
