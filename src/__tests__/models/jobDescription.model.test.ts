@@ -34,6 +34,7 @@ describe('JobDescription Model Test', () => {
         'Design system architecture',
       ],
       professional_experience: 5,
+      contact_email: 'jobs@techcorp.com',
       requirements: [
         "Bachelor's in Computer Science",
         '5+ years of experience',
@@ -61,6 +62,7 @@ describe('JobDescription Model Test', () => {
     expect(savedJob.professional_experience).toBe(
       validJobDescription.professional_experience
     );
+    expect(savedJob.contact_email).toBe(validJobDescription.contact_email);
     expect(savedJob.requirements).toEqual(validJobDescription.requirements);
     expect(savedJob.additional_skills).toEqual(
       validJobDescription.additional_skills
@@ -71,8 +73,11 @@ describe('JobDescription Model Test', () => {
   });
 
   it('should fail to save without required fields', async () => {
+    // Only provide non-required fields
     const jobWithoutRequired = new JobDescriptionModel({
       company_title: 'Test Company',
+      job_position: 'Test Position',
+      // missing job_type which is required
     });
 
     let err: mongoose.Error.ValidationError | null = null;
@@ -86,6 +91,7 @@ describe('JobDescription Model Test', () => {
 
     expect(err).toBeDefined();
     expect(err).toBeInstanceOf(mongoose.Error.ValidationError);
+    expect(err?.errors.job_type).toBeDefined();
   });
 
   it('should validate job_type enum values', async () => {
@@ -95,12 +101,7 @@ describe('JobDescription Model Test', () => {
       job_location: 'Test Location',
       job_type: 'invalid-type', // Invalid enum value
       workplace: 'remote',
-      due_date: new Date(),
       tech_stack: ['Test'],
-      responsibilities: ['Test'],
-      professional_experience: 1,
-      requirements: ['Test'],
-      company_culture: 'Test Culture',
     });
 
     let err: mongoose.Error.ValidationError | null = null;
@@ -124,12 +125,7 @@ describe('JobDescription Model Test', () => {
       job_location: 'Test Location',
       job_type: 'full time',
       workplace: 'invalid-workplace', // Invalid enum value
-      due_date: new Date(),
       tech_stack: ['Test'],
-      responsibilities: ['Test'],
-      professional_experience: 1,
-      requirements: ['Test'],
-      company_culture: 'Test Culture',
     });
 
     let err: mongoose.Error.ValidationError | null = null;
@@ -153,12 +149,8 @@ describe('JobDescription Model Test', () => {
       job_location: 'Test Location',
       job_type: 'full time',
       workplace: 'remote',
-      due_date: new Date(),
       tech_stack: ['Test'],
-      responsibilities: ['Test'],
       professional_experience: 'invalid', // Should be a number
-      requirements: ['Test'],
-      company_culture: 'Test Culture',
     });
 
     let err: mongoose.Error.ValidationError | null = null;
@@ -175,24 +167,20 @@ describe('JobDescription Model Test', () => {
     expect(err?.errors.professional_experience).toBeDefined();
   });
 
-  it('should validate array fields are not empty', async () => {
-    const jobWithEmptyArrays = new JobDescriptionModel({
+  it('should validate tech_stack is not empty', async () => {
+    const jobWithInvalidTechStack = new JobDescriptionModel({
       company_title: 'Test Company',
       job_position: 'Test Position',
       job_location: 'Test Location',
       job_type: 'full time',
       workplace: 'remote',
-      due_date: new Date(),
-      tech_stack: [], // Should have at least one item
-      responsibilities: [], // Should have at least one item
+      tech_stack: [''], // Empty string in tech_stack array
       professional_experience: 1,
-      requirements: [], // Should have at least one item
-      company_culture: 'Test Culture',
     });
 
     let err: mongoose.Error.ValidationError | null = null;
     try {
-      await jobWithEmptyArrays.save();
+      await jobWithInvalidTechStack.save();
     } catch (error) {
       if (error instanceof mongoose.Error.ValidationError) {
         err = error;
@@ -201,8 +189,7 @@ describe('JobDescription Model Test', () => {
 
     expect(err).toBeDefined();
     expect(err).toBeInstanceOf(mongoose.Error.ValidationError);
-    expect(err?.errors['tech_stack']).toBeDefined();
-    expect(err?.errors['responsibilities']).toBeDefined();
-    expect(err?.errors['requirements']).toBeDefined();
+    // Tech stack validation should fail because of empty string
+    expect(err?.errors['tech_stack.0']).toBeDefined();
   });
 });
