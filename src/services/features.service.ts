@@ -79,13 +79,20 @@ export const summarizeContent = async (text: string) => {
       const jsonMatch = response.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
       if (jsonMatch && jsonMatch[1]) {
         const jsonContent = jsonMatch[1].trim();
-        return JSON.parse(jsonContent);
+        try {
+          return JSON.parse(jsonContent);
+        } catch (parseError) {
+          throw new ApiError(500, 'Error processing AI service response');
+        }
       }
 
       // If both attempts fail, throw an error
       throw new ApiError(500, 'Error processing AI service response');
     }
   } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
     console.error('Error processing AI response:', error);
     throw new ApiError(500, 'Error processing AI service response');
   }

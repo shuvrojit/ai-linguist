@@ -1,9 +1,23 @@
-import { Request, Response } from 'express';
-import { featuresService } from '../../services';
+import { Request, Response, NextFunction } from 'express';
+import { featuresService, pageContentService } from '../../services';
 import * as featuresController from '../../controllers/features.controller';
 import ApiError from '../../utils/ApiError';
 
 jest.mock('../../services/features.service');
+jest.mock('../../services');
+jest.mock('../../utils/asyncHandler', () => {
+  return {
+    asyncHandler: jest.fn((fn) => {
+      return async (req: Request, res: Response, next: NextFunction) => {
+        try {
+          await fn(req, res, next);
+        } catch (error) {
+          next(error);
+        }
+      };
+    }),
+  };
+});
 
 describe('Features Controller', () => {
   let mockRequest: Partial<Request>;
@@ -13,12 +27,14 @@ describe('Features Controller', () => {
   beforeEach(() => {
     mockRequest = {
       body: {},
+      params: {},
     };
     mockResponse = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
     };
     mockNext = jest.fn();
+    jest.clearAllMocks();
   });
 
   describe('analyzeMeaning', () => {
@@ -94,6 +110,78 @@ describe('Features Controller', () => {
       expect(featuresService.analyzeContent).toHaveBeenCalledWith(
         'test content'
       );
+    });
+  });
+
+  describe('summarizeById', () => {
+    it('should successfully summarize content by id', async () => {
+      const mockSummaryResult = {
+        summary: 'Test summary',
+        keyPoints: ['Point 1', 'Point 2'],
+        wordCount: { original: 100, summary: 50 },
+      };
+
+      const mockPageContent = {
+        text: 'test content',
+      };
+
+      // Set the ID in params instead of body
+      mockRequest.params = { id: '123' };
+
+      (pageContentService.findById as jest.Mock).mockResolvedValue(
+        mockPageContent
+      );
+      (featuresService.summarizeContent as jest.Mock).mockResolvedValue(
+        mockSummaryResult
+      );
+
+      await featuresController.summarizeById(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(pageContentService.findById).toHaveBeenCalledWith('123');
+      expect(featuresService.summarizeContent).toHaveBeenCalledWith(
+        'test content'
+      );
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(mockSummaryResult);
+    });
+
+    it('should handle missing id', async () => {
+      mockRequest.params = {}; // Empty params
+      mockRequest.body = {}; // Empty body
+
+      await featuresController.summarizeById(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(mockNext).toHaveBeenCalled();
+      const error = mockNext.mock.calls[0][0];
+      expect(error).toBeInstanceOf(ApiError);
+      expect(error.statusCode).toBe(400);
+      expect(error.message).toBe('ID is required');
+    });
+
+    it('should handle page content not found', async () => {
+      mockRequest.params = { id: '123' };
+
+      (pageContentService.findById as jest.Mock).mockResolvedValue(null);
+
+      await featuresController.summarizeById(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      expect(mockNext).toHaveBeenCalled();
+      const error = mockNext.mock.calls[0][0];
+      expect(error).toBeInstanceOf(ApiError);
+      expect(error.statusCode).toBe(404);
+      expect(error.message).toBe('Page content not found');
     });
   });
 });
