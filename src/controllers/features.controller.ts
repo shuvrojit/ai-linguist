@@ -18,9 +18,24 @@ interface ContentRequest {
   };
 }
 
+interface SummarizeRequest extends ContentRequest {}
+
 interface ExtractRequest {
   url: string;
 }
+
+export const summarize = asyncHandler(
+  async (req: Request<unknown, unknown, SummarizeRequest>, res: Response) => {
+    const text = req.body?.content?.text;
+
+    if (!text) {
+      throw new ApiError(400, 'Text content is required');
+    }
+
+    const result = await featuresService.summarizeContent(text);
+    res.status(200).json(result);
+  }
+);
 
 export const analyzeMeaning = asyncHandler(
   async (req: Request<unknown, unknown, ContentRequest>, res: Response) => {

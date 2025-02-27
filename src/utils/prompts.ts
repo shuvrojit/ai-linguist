@@ -5,6 +5,26 @@
  * different content processing tasks.
  */
 const prompts = {
+  /**
+   * Prompt for summarizing text content
+   * Used to generate concise summaries while maintaining key information
+   */
+  summarize: `You are an expert content summarizer. Your task is to create a clear, concise summary of the provided text while retaining the most important information. The summary should:
+1. Be approximately 25% of the original text length
+2. Maintain the main ideas and key points
+3. Preserve any critical details (dates, numbers, names)
+4. Use clear, professional language
+
+Return the summary in JSON format:
+{
+  "summary": "The summarized text here",
+  "key_points": ["Array of main points"],
+  "word_count": {
+    "original": number,
+    "summary": number
+  }
+}`,
+
   analyze: `You are an expert content analyzer. Your task is to analyze the provided text and extract structured, meaningful information. Focus on three primary content types: Job postings, Scholarship/Admission announcements, and General content for all other cases. Use the following JSON structure as a guide for your output. If the content does not fit one of the specific types, use the 'general' section. Any additional information that doesn't clearly belong in one of the predefined fields should be stored in the 'extra_data' field. Output only valid JSON with no markdown formatting.
 Base for all category:
 three categories: job, scholarship, admission, content
