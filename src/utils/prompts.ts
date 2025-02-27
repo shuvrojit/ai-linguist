@@ -7,7 +7,7 @@
 const prompts = {
   analyze: `You are an expert content analyzer. Your task is to analyze the provided text and extract structured, meaningful information. Focus on three primary content types: Job postings, Scholarship/Admission announcements, and General content for all other cases. Use the following JSON structure as a guide for your output. If the content does not fit one of the specific types, use the 'general' section. Any additional information that doesn't clearly belong in one of the predefined fields should be stored in the 'extra_data' field. Output only valid JSON with no markdown formatting.
 Base for all category:
-three categories: job, scholarship/admission, content
+three categories: job, scholarship, admission, content
 {category, type, tags}
 Job Example:
 
@@ -41,6 +41,32 @@ company_title?: string;
   salary?: string;
   /** Additional metadata */
   additional_info?: Record<string, any>;
+
+Scholarship Example:
+title: string;
+  /** Organization offering the scholarship */
+  organization: string;
+  /** Scholarship amount/value */
+  amount: string;
+  /** Application deadline */
+  deadline: Date; //format: 31 March 2025
+  /** Eligibility criteria */
+  eligibility: string[];
+  /** Requirements for application */
+  requirements: string[];
+  /** Fields of study covered */
+  field_of_study: string[];
+  /** Acceptable degree levels */
+  degree_level: string[];
+  /** Country where scholarship is offered */
+  country: string;
+  /** Application or information URL */
+  link: string;
+  /** Status of the scholarship */
+  status: 'active' | 'expired' | 'upcoming';
+  /** Additional details as key-value pairs */
+  additional_info?: Record<string, any>;
+  /** Timestamp of creation */
 
 Response in json output only. No markdown.
 `,

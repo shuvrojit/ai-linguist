@@ -8,12 +8,47 @@ export const analyzeContent = async (text: string) => {
   if (!response) {
     throw new ApiError(500, 'No response from AI service');
   }
-  const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/);
 
-  if (!jsonMatch) {
-    throw new ApiError(500, 'Invalid response format from AI service');
+  try {
+    // Method 1: Try to extract JSON from markdown code blocks with a more robust regex
+    const jsonMatch = response.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+
+    if (jsonMatch && jsonMatch[1]) {
+      const jsonContent = jsonMatch[1].trim();
+      console.log('Extracted JSON content:', jsonContent);
+
+      try {
+        return JSON.parse(jsonContent);
+      } catch (parseError) {
+        console.error('Failed to parse extracted JSON content:', parseError);
+        // Continue to fallback methods
+      }
+    }
+
+    // Method 2: Try parsing the entire response as JSON
+    try {
+      return JSON.parse(response);
+    } catch (error) {
+      // Not valid JSON, continue to next method
+    }
+
+    // Method 3: Try to find any JSON-like content in the response
+    const possibleJsonMatch = response.match(/(\{[\s\S]*\})/);
+    if (possibleJsonMatch && possibleJsonMatch[1]) {
+      try {
+        return JSON.parse(possibleJsonMatch[1]);
+      } catch (error) {
+        // Failed this attempt too
+      }
+    }
+
+    // If we get here, all parsing attempts failed
+    throw new ApiError(
+      500,
+      'Unable to extract valid JSON from AI service response'
+    );
+  } catch (error) {
+    console.error('Error processing AI response:', error);
+    throw new ApiError(500, 'Error processing AI service response');
   }
-  const jsonData = JSON.parse(jsonMatch[1]);
-  console.log(jsonData);
-  return jsonData;
 };

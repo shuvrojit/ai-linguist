@@ -71,31 +71,7 @@ export const analyzeById = asyncHandler(
         break;
 
       case 'scholarship':
-        savedContent = await ScholarshipModel.create({
-          title: result.metadata?.title || 'Untitled Scholarship',
-          organization:
-            result.details.program_info?.provider || 'Unknown Organization',
-          amount: result.details.benefits?.financial || 'Not specified',
-          deadline: new Date(
-            result.details.deadlines?.application || Date.now()
-          ),
-          eligibility: Object.values(result.details.requirements || {}).flat(),
-          requirements: Object.values(result.details.requirements || {}).flat(),
-          field_of_study: result.details.program_info?.type
-            ? [result.details.program_info.type]
-            : ['Not specified'],
-          degree_level: ['Not specified'],
-          country: 'Not specified',
-          link: result.metadata?.source || '',
-          status: 'active',
-          additional_info: {
-            original_content_id: pageContent._id,
-            metadata: result.metadata,
-            benefits: result.details.benefits,
-            tags: result.tags,
-          },
-          extra_data: result.extra_data || {},
-        });
+        savedContent = await ScholarshipModel.create(result);
         break;
 
       case 'blog':
