@@ -7,25 +7,22 @@ jest.mock('../../utils/aiRequest');
 describe('Features Service', () => {
   describe('extractMeaning', () => {
     it('should successfully parse AI response', async () => {
-      const mockResponse = JSON.stringify({
+      const jsonData = {
         category: 'job',
         type: 'job posting',
         metadata: {
           title: 'Software Engineer',
         },
-      });
+      };
+
+      // Format the mock response as a markdown code block with JSON
+      const mockResponse = '```json\n' + JSON.stringify(jsonData) + '\n```';
 
       (AIRequest as jest.Mock).mockResolvedValue(mockResponse);
 
       const result = await analyzeContent('test content');
 
-      expect(result).toEqual({
-        category: 'job',
-        type: 'job posting',
-        metadata: {
-          title: 'Software Engineer',
-        },
-      });
+      expect(result).toEqual(jsonData);
     });
 
     it('should throw ApiError when AI service returns no response', async () => {
@@ -38,7 +35,10 @@ describe('Features Service', () => {
     });
 
     it('should throw ApiError when response is not valid JSON', async () => {
-      (AIRequest as jest.Mock).mockResolvedValue('invalid json');
+      // Use a response without a valid JSON code block
+      (AIRequest as jest.Mock).mockResolvedValue(
+        'just some text without json code block'
+      );
 
       await expect(analyzeContent('test content')).rejects.toThrow(ApiError);
       await expect(analyzeContent('test content')).rejects.toThrow(
