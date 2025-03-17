@@ -1,4 +1,5 @@
 import PageContentModel from './pageContent.model';
+import AdmissionModel from './admission.model';
 import JobDescriptionModel from './jobDescription.model';
 import ScholarshipModel from './scholarship.model';
 import BlogModel from './blog.model';
@@ -14,4 +15,5 @@ export {
   NewsModel,
   TechnicalModel,
   OtherModel,
+  AdmissionModel,
 };
