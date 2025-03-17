@@ -4,6 +4,7 @@ import {
   analyzeById,
   summarize,
   summarizeById,
+  analyzeJobDescription,
 } from './features.controller';
 
 export const featuresController = {
@@ -11,6 +12,7 @@ export const featuresController = {
   analyzeById,
   summarize,
   summarizeById,
+  analyzeJobDescription,
 };
 
 export { pageContentController };

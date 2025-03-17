@@ -13,7 +13,8 @@ import { asyncHandler } from '../utils/asyncHandler';
 import ApiError from '../utils/ApiError';
 
 interface ContentRequest {
-  content: {
+  text?: string;
+  content?: {
     text: string;
   };
 }
@@ -210,3 +211,17 @@ export const analyzeById = asyncHandler(async (req: Request, res: Response) => {
 
   res.status(200).json(result);
 });
+
+export const analyzeJobDescription = asyncHandler(
+  async (req: Request<unknown, unknown, ContentRequest>, res: Response) => {
+    const text = String(req.body?.text);
+
+    if (!text) {
+      throw new ApiError(400, 'Text content is required');
+    }
+
+    const result = await featuresService.analyzeJob(text);
+    await JobDescriptionModel.create(result);
+    res.status(200).json(result);
+  }
+);
