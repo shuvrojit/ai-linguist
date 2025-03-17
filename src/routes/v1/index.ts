@@ -7,6 +7,7 @@ import blogRouter from './blog.routes';
 import newsRouter from './news.routes';
 import technicalRouter from './technical.routes';
 import otherRouter from './other.routes';
+import admissionRouter from './admission.routes';
 
 const router = Router();
 
@@ -14,6 +15,7 @@ router.use('/features', featuresRouter);
 router.use('/page-content', pageContentRouter);
 router.use('/jobs', jobDescriptionRouter);
 router.use('/scholarships', scholarshipRouter);
+router.use('/admissions', admissionRouter);
 router.use('/blogs', blogRouter);
 router.use('/news', newsRouter);
 router.use('/technical', technicalRouter);
