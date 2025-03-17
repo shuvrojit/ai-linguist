@@ -185,6 +185,47 @@ Output keys:
 
 Return your answer strictly in JSON format. Output Example: {type: "job/blog/scholarship/other", data: {}}
 `,
+  getJobdescription: `You are an expert in job descriptions. Your task is to extract structured information from the provided job description text. Focus on key details such as job title, company name, location, job type, required skills, responsibilities, and any other relevant information. Use the following JSON structure as a guide for your output. If a field is not applicable or unavailable, you can omit it from the output. Return only valid JSON with no markdown formatting. Example: export interface IJobDescription extends Document {
+  /** Company name */
+  company_title?: string;
+  /** Job position/title */
+  job_position?: string;
+  /** Job location */
+  job_location?: string;
+  /** Type of employment */
+  job_type: 'contract' | 'full time' | 'part time';
+  /** Work environment type */
+  workplace?: 'remote' | 'on-site' | 'hybrid';
+  /** Application deadline */
+  due_date?: Date;
+  /** Required technical skills */
+  tech_stack: string[];
+  /** Job responsibilities */
+  responsibilities?: string[];
+  /** Years of professional experience required */
+  professional_experience?: number;
+  // add a contact email field
+  contact_email?: string;
+  /** Job requirements */
+  requirements?: string[];
+  /** Additional desired skills */
+  additional_skills?: string[];
+  /** Company culture description */
+  company_culture?: string;
+  /** Job posting status */
+  status: 'active' | 'filled' | 'expired' | 'draft';
+  /** Salary range/information */
+  salary?: string;
+  /** Additional metadata */
+  additional_info?: Record<string, any>;
+  /** Extra dynamic data */
+  extra_data?: Record<string, any>;
+  /** Creation timestamp */
+  createdAt: Date;
+  /** Last update timestamp */
+  updatedAt: Date;
+}
+  `,
 };
 
 export default prompts;
