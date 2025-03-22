@@ -5,3 +5,4 @@ build
 /.env
 api-examples.org
 src/controllers/semantiai.code-workspace
+/uploads/
