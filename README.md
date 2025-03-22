@@ -77,6 +77,24 @@ yarn docker:test
 
 All API endpoints are prefixed with `/api/v1`.
 
+### User Management Routes
+
+- `POST /users/register` - Register new user (requires firstName, lastName, email, password)
+- `POST /users/login` - Authenticate user
+- `GET /users` - Get users list (paginated)
+- `GET /users/:id` - Get user by ID
+- `PATCH /users/:id` - Update user information
+- `PATCH /users/:id/profile` - Update user profile (bio, avatar, location, etc.)
+- `DELETE /users/:id` - Delete user
+
+User profile supports:
+
+- Basic info (bio, avatar, location)
+- Contact details (website, phone number)
+- Personal info (date of birth)
+- Interests array
+- Social links (Twitter, LinkedIn, GitHub)
+
 ### Features Routes
 
 - `POST /features/analyze` - Analyze content meaning
