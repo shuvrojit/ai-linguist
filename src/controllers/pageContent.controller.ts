@@ -33,39 +33,27 @@ export const pageContentController = {
         message: 'Content saved successfully',
       });
 
-      // Handle analysis in background
-      process.nextTick(async () => {
-        try {
-          // Create a properly typed mock Response object
-          const mockRes = {
-            json: () => {},
-            status: () => ({ json: () => {} }),
-            sendStatus: () => {},
-            links: () => {},
-            send: () => {},
-            jsonp: () => {},
-            // Add other required Response methods as no-ops
-            get: () => '',
-            set: () => mockRes,
-            header: () => mockRes,
-            cookie: () => mockRes,
-          } as unknown as Response;
+      const partialRes = {
+        json: () => {},
+        status: () => ({ json: () => {} }),
+        sendStatus: () => {},
+        links: () => {},
+        send: () => {},
+        jsonp: () => {},
+        get: () => '',
+        set: () => partialRes,
+        header: () => partialRes,
+        cookie: () => partialRes,
+      } as unknown as Response;
 
-          const mockNext = () => {};
-
-          await featuresController.analyzeById(
-            {
-              body: { id: content._id.toString() },
-              params: { id: content._id.toString() },
-            } as Request<{ id: string }>,
-            mockRes,
-            mockNext
-          );
-          console.log('Content saved and analyzed successfully');
-        } catch (error) {
-          console.error('Error analyzing content:', error);
-        }
-      });
+      await featuresController.analyzeById(
+        {
+          body: { id: content._id.toString() },
+          params: { id: content._id.toString() },
+        } as Request<{ id: string }>,
+        partialRes,
+        () => {}
+      );
     }
   ),
 
@@ -99,11 +87,37 @@ export const pageContentController = {
     });
   }),
 
-  getAll: asyncHandler(async (_: Request, res: Response) => {
-    const contents = await pageContentService.findAll();
+  getAll: asyncHandler(async (req: Request, res: Response) => {
+    const { sortBy, sortOrder, page, limit, search, searchFields } = req.query;
+
+    // Parse searchFields if provided
+    let parsedSearchFields: ('title' | 'text' | 'url')[] | undefined;
+    if (searchFields) {
+      parsedSearchFields = (searchFields as string).split(',') as (
+        | 'title'
+        | 'text'
+        | 'url'
+      )[];
+    }
+
+    const options = {
+      sortBy: sortBy as string,
+      sortOrder: sortOrder as 'asc' | 'desc',
+      page: page ? parseInt(page as string, 10) : undefined,
+      limit: limit ? parseInt(limit as string, 10) : undefined,
+      search: search as string,
+      searchFields: parsedSearchFields,
+    };
+
+    const contents = await pageContentService.findAll(options);
     res.status(200).json({
       success: true,
-      links: contents,
+      data: contents.data,
+      meta: {
+        total: contents.total,
+        page: contents.page,
+        limit: contents.limit,
+      },
     });
   }),
 

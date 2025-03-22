@@ -27,6 +27,18 @@ export interface CreatePageContent {
 }
 
 /**
+ * Interface for pagination and sorting options
+ */
+export interface QueryOptions {
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+  search?: string;
+  searchFields?: ('url' | 'text' | 'title')[];
+}
+
+/**
  * Service for managing page content operations
  */
 export const pageContentService = {
@@ -41,12 +53,14 @@ export const pageContentService = {
   },
 
   /**
-   * Finds page content by URL
+   * Finds page content by URL, returning the most recent if multiple exist
    * @param url - The URL to search for
    * @returns Promise resolving to the found page content or null
    */
   async findByUrl(url: string): Promise<IPageContent | null> {
-    return await PageContentModel.findOne({ url });
+    return await PageContentModel.findOne({ url })
+      .sort({ createdAt: -1, _id: -1 })
+      .lean();
   },
 
   /**
@@ -55,15 +69,86 @@ export const pageContentService = {
    * @returns Promise resolving to the found page content or null
    */
   async findById(id: string | Types.ObjectId): Promise<IPageContent | null> {
-    return await PageContentModel.findById(id);
+    return await PageContentModel.findById(id).lean();
   },
 
   /**
-   * Retrieves all page contents
-   * @returns Promise resolving to an array of page contents
+   * Retrieves all page contents with sorting and pagination
+   * @param options - Query options for sorting and pagination
+   * @returns Promise resolving to page content result object
    */
-  async findAll(): Promise<IPageContent[]> {
-    return await PageContentModel.find();
+  async findAll(options?: QueryOptions): Promise<{
+    data: IPageContent[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const {
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      page = 1,
+      limit = 20,
+      search = '',
+      searchFields = ['title', 'text', 'url'],
+    } = options || {};
+
+    const sortDirection = sortOrder === 'asc' ? 1 : -1;
+    const skip = (page - 1) * limit;
+
+    let pipeline: any[] = [];
+
+    // Add search conditions if search string is provided
+    if (search && search.trim() !== '') {
+      const searchRegex = { $regex: search, $options: 'i' };
+      const orConditions = [];
+
+      if (searchFields.includes('title')) {
+        orConditions.push({ title: searchRegex });
+      }
+
+      if (searchFields.includes('text')) {
+        orConditions.push({ text: searchRegex });
+      }
+
+      if (searchFields.includes('url')) {
+        orConditions.push({ url: searchRegex });
+      }
+
+      if (orConditions.length > 0) {
+        pipeline.push({ $match: { $or: orConditions } });
+      }
+    }
+
+    // Add sorting and pagination stages
+    pipeline = [
+      ...pipeline,
+      { $sort: { [sortBy]: sortDirection, _id: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ];
+
+    // For count, use the same search conditions if any
+    const countPipeline =
+      search && search.trim() !== ''
+        ? pipeline.filter((stage) => Object.keys(stage)[0] === '$match')
+        : [];
+
+    countPipeline.push({ $count: 'total' });
+
+    // Use aggregation for better performance with filtering, sorting and pagination
+    const [results, countResult] = await Promise.all([
+      PageContentModel.aggregate(pipeline),
+      PageContentModel.aggregate(countPipeline),
+    ]);
+
+    const total = countResult.length > 0 ? countResult[0].total : 0;
+
+    return {
+      data: results,
+      total,
+      page,
+      limit,
+    };
   },
 
   /**

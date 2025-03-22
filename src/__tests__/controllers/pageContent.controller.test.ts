@@ -346,22 +346,81 @@ describe('Page Content Controller', () => {
   });
 
   describe('getAll', () => {
-    it('should get all contents and return 200 status', async () => {
+    it('should get all contents with default parameters and return 200 status', async () => {
       // Arrange
-      const mockContents = [
-        {
-          _id: 'mock-id-1',
-          url: 'https://example.com/page1',
-          title: 'Page 1',
-          content: 'Content for page 1',
+      const mockContents = {
+        data: [
+          {
+            _id: 'mock-id-1',
+            url: 'https://example.com/page1',
+            title: 'Page 1',
+            content: 'Content for page 1',
+          },
+          {
+            _id: 'mock-id-2',
+            url: 'https://example.com/page2',
+            title: 'Page 2',
+            content: 'Content for page 2',
+          },
+        ],
+        total: 2,
+        page: 1,
+        limit: 10,
+      };
+
+      mockRequest.query = {};
+      (pageContentService.findAll as jest.Mock).mockResolvedValue(mockContents);
+
+      // Act
+      await pageContentController.getAll(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      // Assert
+      expect(pageContentService.findAll).toHaveBeenCalledWith({
+        sortBy: undefined,
+        sortOrder: undefined,
+        page: undefined,
+        limit: undefined,
+        search: undefined,
+        searchFields: undefined,
+      });
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        success: true,
+        data: mockContents.data,
+        meta: {
+          total: mockContents.total,
+          page: mockContents.page,
+          limit: mockContents.limit,
         },
-        {
-          _id: 'mock-id-2',
-          url: 'https://example.com/page2',
-          title: 'Page 2',
-          content: 'Content for page 2',
-        },
-      ];
+      });
+    });
+
+    it('should get paginated and sorted contents and return 200 status', async () => {
+      // Arrange
+      const mockContents = {
+        data: [
+          {
+            _id: 'mock-id-2',
+            url: 'https://example.com/page2',
+            title: 'Page 2',
+            content: 'Content for page 2',
+          },
+        ],
+        total: 2,
+        page: 2,
+        limit: 1,
+      };
+
+      mockRequest.query = {
+        sortBy: 'title',
+        sortOrder: 'desc',
+        page: '2',
+        limit: '1',
+      };
 
       (pageContentService.findAll as jest.Mock).mockResolvedValue(mockContents);
 
@@ -373,17 +432,81 @@ describe('Page Content Controller', () => {
       );
 
       // Assert
-      expect(pageContentService.findAll).toHaveBeenCalled();
+      expect(pageContentService.findAll).toHaveBeenCalledWith({
+        sortBy: 'title',
+        sortOrder: 'desc',
+        page: 2,
+        limit: 1,
+        search: undefined,
+        searchFields: undefined,
+      });
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({
         success: true,
-        links: mockContents,
+        data: mockContents.data,
+        meta: {
+          total: mockContents.total,
+          page: mockContents.page,
+          limit: mockContents.limit,
+        },
+      });
+    });
+
+    it('should get searched contents and return 200 status', async () => {
+      // Arrange
+      const mockContents = {
+        data: [
+          {
+            _id: 'mock-id-1',
+            url: 'https://example.com/page1',
+            title: 'Page with Search Term',
+            content: 'Content for page 1',
+          },
+        ],
+        total: 1,
+        page: 1,
+        limit: 10,
+      };
+
+      mockRequest.query = {
+        search: 'Search Term',
+        searchFields: 'title,url',
+      };
+
+      (pageContentService.findAll as jest.Mock).mockResolvedValue(mockContents);
+
+      // Act
+      await pageContentController.getAll(
+        mockRequest as Request,
+        mockResponse as Response,
+        mockNext
+      );
+
+      // Assert
+      expect(pageContentService.findAll).toHaveBeenCalledWith({
+        sortBy: undefined,
+        sortOrder: undefined,
+        page: undefined,
+        limit: undefined,
+        search: 'Search Term',
+        searchFields: ['title', 'url'],
+      });
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        success: true,
+        data: mockContents.data,
+        meta: {
+          total: mockContents.total,
+          page: mockContents.page,
+          limit: mockContents.limit,
+        },
       });
     });
 
     it('should handle service errors', async () => {
       // Arrange
       const error = new Error('Database error');
+      mockRequest.query = {};
       (pageContentService.findAll as jest.Mock).mockRejectedValue(error);
 
       // Act
