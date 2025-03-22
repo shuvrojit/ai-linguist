@@ -1,14 +1,32 @@
 import mongoose, { Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+export interface IUserProfile {
+  bio?: string;
+  avatar?: string;
+  location?: string;
+  website?: string;
+  phoneNumber?: string;
+  dateOfBirth?: Date;
+  interests?: string[];
+  socialLinks?: {
+    twitter?: string;
+    linkedin?: string;
+    github?: string;
+  };
+}
+
 export interface IUser extends Document {
   email: string;
   password: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   role: 'user' | 'admin';
+  profile: IUserProfile;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
+  fullName: string;
 }
 
 const userSchema = new mongoose.Schema<IUser>(
@@ -25,7 +43,12 @@ const userSchema = new mongoose.Schema<IUser>(
       required: true,
       minlength: 8,
     },
-    name: {
+    firstName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    lastName: {
       type: String,
       required: true,
       trim: true,
@@ -35,11 +58,30 @@ const userSchema = new mongoose.Schema<IUser>(
       enum: ['user', 'admin'],
       default: 'user',
     },
+    profile: {
+      bio: String,
+      avatar: String,
+      location: String,
+      website: String,
+      phoneNumber: String,
+      dateOfBirth: Date,
+      interests: [String],
+      socialLinks: {
+        twitter: String,
+        linkedin: String,
+        github: String,
+      },
+    },
   },
   {
     timestamps: true,
   }
 );
+
+// Virtual for user's full name
+userSchema.virtual('fullName').get(function (this: IUser) {
+  return `${this.firstName} ${this.lastName}`;
+});
 
 // Hash password before saving
 userSchema.pre('save', async function (next) {
@@ -59,6 +101,9 @@ userSchema.methods.comparePassword = async function (
   candidatePassword: string
 ): Promise<boolean> {
   return bcrypt.compare(candidatePassword, this.password);
+  // Ensure virtuals are included when converting to JSON
+  userSchema.set('toJSON', { virtuals: true });
+  userSchema.set('toObject', { virtuals: true });
 };
 
 const User = mongoose.model<IUser>('User', userSchema);
