@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 import mongoose from 'mongoose';
 import ApiError from '../utils/ApiError';
 import logger from '../config/logger';
@@ -33,7 +33,12 @@ const handleMongooseDuplicateKeyError = (err: any) => {
  * Central error handling middleware
  * Handles different types of errors and sends appropriate response
  */
-export const errorHandler = (err: Error, _req: Request, res: Response) => {
+export const errorHandler: ErrorRequestHandler = (
+  err: Error,
+  _req: Request,
+  res: Response,
+  _next: NextFunction
+) => {
   // Log error for debugging
   logger.error('Error:', {
     name: err.name,
@@ -55,15 +60,16 @@ export const errorHandler = (err: Error, _req: Request, res: Response) => {
 
   // Send error response
   if (error instanceof ApiError) {
-    return res.status(error.statusCode).json({
+    res.status(error.statusCode).json({
       success: false,
       message: error.message,
       ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
     });
+    return;
   }
 
   // Unknown error
-  return res.status(500).json({
+  res.status(500).json({
     success: false,
     message: 'Internal server error',
     ...(process.env.NODE_ENV === 'development' && {
